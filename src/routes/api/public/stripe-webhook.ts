@@ -38,7 +38,7 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
             status: "paid",
             stripe_payment_intent_id: typeof session.payment_intent === "string" ? session.payment_intent : null,
             stripe_customer_id: typeof session.customer === "string" ? session.customer : null,
-            shipping_address: session.shipping_details ?? null,
+            shipping_address: (session as any).shipping_details ?? (session as any).collected_information?.shipping_details ?? null,
           }).eq("stripe_session_id", session.id);
         }
 

@@ -46,7 +46,7 @@ function Shop() {
     } }),
   });
 
-  const update = (patch: Record<string, any>) => nav({ search: (prev) => ({ ...prev, ...patch }) as any });
+  const update = (patch: Record<string, any>) => nav({ search: (prev: any) => ({ ...prev, ...patch }) as any });
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">
