@@ -43,12 +43,9 @@ export const getProductBySlug = createServerFn({ method: "POST" })
     const { data: product, error } = await supabaseAdmin.from("products").select("*").eq("slug", data.slug).maybeSingle();
     if (error) throw new Error(error.message);
     if (!product) return { product: null, related: [] };
-    const { data: related } = await supabaseAdmin
-      .from("products")
-      .select("*")
-      .eq("design_style", product.design_style)
-      .neq("id", product.id)
-      .limit(4);
+    let relQ = supabaseAdmin.from("products").select("*").neq("id", product.id);
+    relQ = product.design_style ? relQ.eq("design_style", product.design_style) : relQ;
+    const { data: related } = await relQ.limit(4);
     return { product, related: related ?? [] };
   });
 
