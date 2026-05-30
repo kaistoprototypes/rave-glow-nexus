@@ -68,30 +68,35 @@ export const createCheckout = createServerFn({ method: "POST" })
     const origin = process.env.PUBLIC_URL
       ?? `https://${process.env.LOVABLE_PUBLIC_HOST ?? "project--24e6b821-7ac9-4112-b1e7-4cf3bbadc2fd.lovable.app"}`;
 
-    const session = await stripe.checkout.sessions.create({
-      mode: "payment",
-      customer_email: data.email,
-      line_items: data.items.map((i) => {
-        const p = priceMap.get(i.productId)!;
-        return {
-          quantity: i.quantity,
-          price_data: {
-            currency: "usd",
-            unit_amount: Math.round(Number(p.price) * 100),
-            product_data: {
-              name: i.name,
-              description: [i.size, i.color].filter(Boolean).join(" · ") || undefined,
-            },
+    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = data.items.map((i) => {
+      const p = priceMap.get(i.productId)!;
+      return {
+        quantity: i.quantity,
+        price_data: {
+          currency: "usd",
+          unit_amount: Math.round(Number(p.price) * 100),
+          product_data: {
+            name: i.name,
+            description: [i.size, i.color].filter(Boolean).join(" · ") || undefined,
           },
-        };
-      }).concat(shipping > 0 ? [{
+        },
+      };
+    });
+    if (shipping > 0) {
+      lineItems.push({
         quantity: 1,
         price_data: {
           currency: "usd",
           unit_amount: shipping * 100,
           product_data: { name: "Shipping" },
         },
-      }] : []),
+      });
+    }
+
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      customer_email: data.email,
+      line_items: lineItems,
       shipping_address_collection: { allowed_countries: ["US","CA","GB","AU","DE","FR","NL","ES","IT","MX","BR","JP"] },
       metadata: { order_id: order.id },
       success_url: `${origin}/order/success?session_id={CHECKOUT_SESSION_ID}`,
