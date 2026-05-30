@@ -1,0 +1,69 @@
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useCart } from "@/lib/cart-store";
+import { ProductArt } from "@/components/ProductArt";
+import { money } from "@/lib/format";
+import { Minus, Plus, Trash2 } from "lucide-react";
+
+export const Route = createFileRoute("/cart")({
+  head: () => ({ meta: [{ title: "Your bag — Electric Pulse Emporium" }] }),
+  component: Cart,
+});
+
+function Cart() {
+  const { items, setQty, remove, subtotal } = useCart();
+  const nav = useNavigate();
+  const shipping = subtotal() > 80 || items.length === 0 ? 0 : 9;
+  const total = subtotal() + shipping;
+
+  return (
+    <div className="mx-auto max-w-6xl px-4 py-10">
+      <h1 className="font-display text-4xl md:text-6xl font-black mb-8">Your bag</h1>
+      {items.length === 0 ? (
+        <div className="card-glow rounded-2xl p-16 text-center">
+          <p className="text-xl font-display">Empty. The floor awaits.</p>
+          <Link to="/shop" className="btn-neon mt-6 inline-block rounded-full px-7 py-2.5 text-xs">Browse drops</Link>
+        </div>
+      ) : (
+        <div className="grid gap-8 md:grid-cols-[1fr_360px]">
+          <div className="space-y-3">
+            {items.map((i) => (
+              <div key={`${i.productId}-${i.size}-${i.color}`} className="flex gap-4 card-glow rounded-xl p-3">
+                <div className="h-28 w-28 rounded-md overflow-hidden flex-shrink-0">
+                  <ProductArt palette={i.image_palette ?? ["#39FF14","#00E5FF","#FF00C8"]} name={i.name} className="h-full w-full" />
+                </div>
+                <div className="flex-1">
+                  <Link to="/products/$slug" params={{ slug: i.slug }} className="font-bold hover:text-[color:var(--lime)]">{i.name}</Link>
+                  <p className="text-xs text-muted-foreground mt-1">{[i.size, i.color].filter(Boolean).join(" · ")}</p>
+                  <div className="mt-3 flex items-center justify-between">
+                    <div className="inline-flex items-center rounded-full border border-border">
+                      <button onClick={()=>setQty(i.productId, i.quantity - 1, i.size, i.color)} className="grid h-8 w-8 place-items-center"><Minus className="h-3 w-3" /></button>
+                      <span className="px-3 text-sm">{i.quantity}</span>
+                      <button onClick={()=>setQty(i.productId, i.quantity + 1, i.size, i.color)} className="grid h-8 w-8 place-items-center"><Plus className="h-3 w-3" /></button>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="font-bold text-[color:var(--cyan)]">{money(i.price * i.quantity)}</span>
+                      <button onClick={()=>remove(i.productId, i.size, i.color)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-4 w-4" /></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <aside className="card-glow rounded-2xl p-6 h-fit space-y-4">
+            <h3 className="font-display text-lg font-bold uppercase tracking-widest">Summary</h3>
+            <Row label="Subtotal" value={money(subtotal())} />
+            <Row label="Shipping" value={shipping === 0 ? "Free" : money(shipping)} />
+            <div className="border-t border-border/40 pt-3 flex justify-between text-lg font-bold">
+              <span>Total</span><span className="text-[color:var(--lime)] glow-lime">{money(total)}</span>
+            </div>
+            <button onClick={() => nav({ to: "/checkout" })} className="btn-neon w-full rounded-full py-3 text-sm">Checkout</button>
+          </aside>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Row({ label, value }: { label: string; value: string }) {
+  return <div className="flex justify-between text-sm"><span className="text-muted-foreground">{label}</span><span>{value}</span></div>;
+}
