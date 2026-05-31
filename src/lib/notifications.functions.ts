@@ -137,7 +137,7 @@ const DEFAULT_SETTINGS = {
     "Neon Mirage Tee","Strobe Bandana","UV Reactive Hoodie","Plasma Bucket Hat",
     "Holographic Visor","Cosmic Carnival Tank","Bass Night Joggers","Desert Lights Shorts",
   ],
-} as const;
+};
 
 type NotificationSettings = typeof DEFAULT_SETTINGS;
 
