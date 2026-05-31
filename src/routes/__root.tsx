@@ -15,6 +15,7 @@ import { Footer } from "@/components/Footer";
 import { CartSheet } from "@/components/CartSheet";
 import { AnimatedBg } from "@/components/AnimatedBg";
 import { Toaster } from "@/components/ui/sonner";
+import { OrderNotifications } from "@/components/OrderNotifications";
 import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
@@ -105,6 +106,7 @@ function RootComponent() {
       </main>
       <Footer />
       <CartSheet />
+      <OrderNotifications />
       <Toaster />
     </QueryClientProvider>
   );
