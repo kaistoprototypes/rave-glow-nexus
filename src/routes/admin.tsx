@@ -144,6 +144,8 @@ function Admin() {
           </div>
         </div>
       )}
+
+      {tab === "notifications" && <AdminNotificationsPanel />}
     </div>
   );
 }
