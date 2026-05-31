@@ -36,6 +36,7 @@ export const adminUpdateProduct = createServerFn({ method: "POST" })
       is_best_seller: z.boolean().optional(),
       is_new_drop: z.boolean().optional(),
       inventory: z.number().int().optional(),
+      sold_count: z.number().int().min(0).max(1000000).optional(),
     }),
   }))
   .handler(async ({ context, data }) => {
