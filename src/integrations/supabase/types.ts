@@ -181,6 +181,42 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_audit_logs: {
+        Row: {
+          action: string
+          changed_keys: string[]
+          created_at: string
+          diff: Json
+          id: string
+          new_value: Json | null
+          previous_value: Json | null
+          user_email: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action?: string
+          changed_keys?: string[]
+          created_at?: string
+          diff?: Json
+          id?: string
+          new_value?: Json | null
+          previous_value?: Json | null
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          changed_keys?: string[]
+          created_at?: string
+          diff?: Json
+          id?: string
+          new_value?: Json | null
+          previous_value?: Json | null
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           created_at: string
@@ -368,6 +404,7 @@ export type Database = {
           sizes: string[]
           sku: string | null
           slug: string
+          sold_count: number
           status: string
           tags: string[]
           updated_at: string
@@ -400,6 +437,7 @@ export type Database = {
           sizes?: string[]
           sku?: string | null
           slug: string
+          sold_count?: number
           status?: string
           tags?: string[]
           updated_at?: string
@@ -432,6 +470,7 @@ export type Database = {
           sizes?: string[]
           sku?: string | null
           slug?: string
+          sold_count?: number
           status?: string
           tags?: string[]
           updated_at?: string
