@@ -85,9 +85,12 @@ function ProductPage() {
           </div>
           <h1 className="font-display text-4xl md:text-5xl font-black">{p.name}</h1>
           <p className="text-muted-foreground">{p.short_description}</p>
-          <div className="flex items-baseline gap-3">
+          <div className="flex items-baseline gap-3 flex-wrap">
             <span className="text-3xl font-bold text-[color:var(--lime)] glow-lime">{money(price)}</span>
             {compare && <span className="text-lg line-through text-muted-foreground">{money(compare)}</span>}
+            {p.sold_count > 0 && (
+              <span className="text-xs text-muted-foreground">· <strong className="text-foreground">{Number(p.sold_count).toLocaleString()}</strong> sold</span>
+            )}
           </div>
 
           {sizes.length > 0 && (
