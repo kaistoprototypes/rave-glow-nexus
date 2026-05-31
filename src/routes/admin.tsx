@@ -86,7 +86,7 @@ function Admin() {
           <div className="card-glow rounded-2xl overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-card/60 text-left text-xs uppercase tracking-widest text-muted-foreground">
-                <tr><th className="p-3">Name</th><th className="p-3">Price</th><th className="p-3">Flags</th><th className="p-3">Status</th><th className="p-3">AI</th></tr>
+                <tr><th className="p-3">Name</th><th className="p-3">Price</th><th className="p-3">Sold</th><th className="p-3">Flags</th><th className="p-3">Status</th><th className="p-3">AI</th></tr>
               </thead>
               <tbody>
                 {prods?.products?.map((p: any) => (
@@ -152,6 +152,7 @@ function Admin() {
 
 function AdminRow({ p, onPrice, onToggle, onAi }: any) {
   const [price, setPrice] = useState(String(p.price));
+  const [sold, setSold] = useState(String(p.sold_count ?? 0));
   const [busy, setBusy] = useState(false);
   return (
     <tr className="border-t border-border/30">
@@ -160,7 +161,10 @@ function AdminRow({ p, onPrice, onToggle, onAi }: any) {
         <div className="text-xs text-muted-foreground">{p.product_type} · {p.gender}</div>
       </td>
       <td className="p-3">
-        <input type="number" value={price} onChange={(e)=>setPrice(e.target.value)} onBlur={()=>onPrice(p.id, Number(price))} className="w-20 rounded-md bg-input/60 border border-border px-2 py-1 text-sm" />
+        <input type="number" value={price} onChange={(e)=>setPrice(e.target.value)} onBlur={()=>onPrice(p.id, Number(price))} className="w-20 rounded-md bg-input/60 border border-border px-2 py-1 text-sm" aria-label={`Price for ${p.name}`} />
+      </td>
+      <td className="p-3">
+        <input type="number" min={0} value={sold} onChange={(e)=>setSold(e.target.value)} onBlur={()=>onToggle(p.id, { sold_count: Math.max(0, Number(sold) || 0) })} className="w-20 rounded-md bg-input/60 border border-border px-2 py-1 text-sm" aria-label={`Sold count for ${p.name}`} />
       </td>
       <td className="p-3 space-x-1">
         <Pill on={p.is_featured} onClick={()=>onToggle(p.id, { is_featured: !p.is_featured })}>Feat</Pill>
@@ -168,12 +172,12 @@ function AdminRow({ p, onPrice, onToggle, onAi }: any) {
         <Pill on={p.is_new_drop} onClick={()=>onToggle(p.id, { is_new_drop: !p.is_new_drop })}>New</Pill>
       </td>
       <td className="p-3">
-        <select value={p.status} onChange={(e)=>onToggle(p.id, { status: e.target.value })} className="rounded-md bg-input/60 border border-border px-2 py-1 text-xs">
+        <select value={p.status} onChange={(e)=>onToggle(p.id, { status: e.target.value })} className="rounded-md bg-input/60 border border-border px-2 py-1 text-xs" aria-label={`Status for ${p.name}`}>
           <option value="active">active</option><option value="draft">draft</option><option value="archived">archived</option>
         </select>
       </td>
       <td className="p-3">
-        <button onClick={async()=>{ setBusy(true); try { await onAi(); } finally { setBusy(false); } }} className="inline-flex items-center gap-1 rounded-full bg-[color:var(--magenta)] px-3 py-1 text-[10px] font-bold uppercase text-white disabled:opacity-50" disabled={busy}>
+        <button onClick={async()=>{ setBusy(true); try { await onAi(); } finally { setBusy(false); } }} className="inline-flex items-center gap-1 rounded-full bg-[color:var(--magenta)] px-3 py-1 text-[10px] font-bold uppercase text-white disabled:opacity-50" disabled={busy} aria-label={`Generate AI copy for ${p.name}`}>
           {busy ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />} Gen
         </button>
       </td>
