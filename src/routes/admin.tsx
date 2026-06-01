@@ -6,9 +6,12 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   adminListProducts, adminUpdateProduct, adminBulkPrice,
   adminListOrders, adminGenerateProductCopy, adminApplyAiCopy,
+  adminCreateProduct, adminDeleteProduct,
+  adminUpdateOrder, adminDeleteOrder,
+  adminListCoupons, adminUpsertCoupon, adminDeleteCoupon,
 } from "@/lib/admin.functions";
 import { money } from "@/lib/format";
-import { Loader2, Sparkles, CheckCircle2, Search } from "lucide-react";
+import { Loader2, Sparkles, Search, Plus, Trash2, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { AdminNotificationsPanel } from "@/components/AdminNotificationsPanel";
 
