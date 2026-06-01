@@ -26,6 +26,7 @@ export const adminUpdateProduct = createServerFn({ method: "POST" })
     id: z.string().uuid(),
     patch: z.object({
       name: z.string().optional(),
+      slug: z.string().optional(),
       price: z.number().optional(),
       compare_at_price: z.number().nullable().optional(),
       status: z.enum(["active", "draft", "archived"]).optional(),
@@ -37,11 +38,114 @@ export const adminUpdateProduct = createServerFn({ method: "POST" })
       is_new_drop: z.boolean().optional(),
       inventory: z.number().int().optional(),
       sold_count: z.number().int().min(0).max(1000000).optional(),
+      product_type: z.string().optional(),
+      gender: z.string().optional(),
+      featured_image: z.string().nullable().optional(),
     }),
   }))
   .handler(async ({ context, data }) => {
     await assertAdmin(context.userId);
     const { error } = await supabaseAdmin.from("products").update(data.patch).eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const adminCreateProduct = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(z.object({
+    name: z.string().min(1).max(200),
+    slug: z.string().min(1).max(200).regex(/^[a-z0-9-]+$/, "lowercase, numbers, hyphens"),
+    price: z.number().min(0),
+    product_type: z.string().min(1).max(60).default("tee"),
+    gender: z.string().min(1).max(30).default("unisex"),
+    status: z.enum(["active", "draft", "archived"]).default("draft"),
+    short_description: z.string().max(500).optional(),
+    inventory: z.number().int().min(0).default(100),
+  }))
+  .handler(async ({ context, data }) => {
+    await assertAdmin(context.userId);
+    const { data: row, error } = await supabaseAdmin.from("products").insert(data).select("id").single();
+    if (error) throw new Error(error.message);
+    return { id: row.id };
+  });
+
+export const adminDeleteProduct = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(z.object({ id: z.string().uuid() }))
+  .handler(async ({ context, data }) => {
+    await assertAdmin(context.userId);
+    const { error } = await supabaseAdmin.from("products").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const adminUpdateOrder = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(z.object({
+    id: z.string().uuid(),
+    patch: z.object({
+      status: z.enum(["pending", "paid", "fulfilled", "cancelled", "refunded"]).optional(),
+      notes: z.string().max(2000).nullable().optional(),
+    }),
+  }))
+  .handler(async ({ context, data }) => {
+    await assertAdmin(context.userId);
+    const { error } = await supabaseAdmin.from("orders").update(data.patch).eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const adminDeleteOrder = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(z.object({ id: z.string().uuid() }))
+  .handler(async ({ context, data }) => {
+    await assertAdmin(context.userId);
+    await supabaseAdmin.from("order_items").delete().eq("order_id", data.id);
+    const { error } = await supabaseAdmin.from("orders").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const adminListCoupons = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.userId);
+    const { data, error } = await supabaseAdmin.from("coupons").select("*").order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    return { coupons: data ?? [] };
+  });
+
+export const adminUpsertCoupon = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(z.object({
+    id: z.string().uuid().optional(),
+    code: z.string().min(2).max(40).regex(/^[A-Z0-9_-]+$/, "uppercase letters, numbers, _ or -"),
+    description: z.string().max(200).nullable().optional(),
+    percent_off: z.number().int().min(1).max(100).nullable().optional(),
+    amount_off: z.number().min(0).nullable().optional(),
+    usage_limit: z.number().int().min(1).nullable().optional(),
+    active: z.boolean().default(true),
+  }))
+  .handler(async ({ context, data }) => {
+    await assertAdmin(context.userId);
+    const payload = { ...data };
+    if (data.id) {
+      const { error } = await supabaseAdmin.from("coupons").update(payload).eq("id", data.id);
+      if (error) throw new Error(error.message);
+      return { id: data.id };
+    }
+    const { id: _omit, ...insertPayload } = payload;
+    const { data: row, error } = await supabaseAdmin.from("coupons").insert(insertPayload).select("id").single();
+    if (error) throw new Error(error.message);
+    return { id: row.id };
+  });
+
+export const adminDeleteCoupon = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(z.object({ id: z.string().uuid() }))
+  .handler(async ({ context, data }) => {
+    await assertAdmin(context.userId);
+    const { error } = await supabaseAdmin.from("coupons").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
