@@ -41,9 +41,9 @@ function Account() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-10">
       <header className="mb-8 flex flex-wrap items-center justify-between gap-3">
-        <div>
+        <div className="min-w-0 max-w-full">
           <p className="text-xs uppercase tracking-widest text-[color:var(--lime)]">Account</p>
-          <h1 className="font-display text-4xl md:text-5xl font-black">{user.email}</h1>
+          <h1 className="font-display text-2xl sm:text-3xl md:text-5xl font-black break-all">{user.email}</h1>
         </div>
         <div className="flex gap-2">
           {isAdmin && <Link to="/admin" className="btn-outline-neon rounded-full px-5 py-2 text-xs inline-flex items-center gap-2"><Shield className="h-3.5 w-3.5" />Admin</Link>}
