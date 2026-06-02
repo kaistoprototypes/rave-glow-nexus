@@ -14,6 +14,7 @@ import { money } from "@/lib/format";
 import { Loader2, Sparkles, Search, Plus, Trash2, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { AdminNotificationsPanel } from "@/components/AdminNotificationsPanel";
+import { MediaManagerPanel } from "@/components/MediaManagerPanel";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin — Electric Pulse Emporium" }] }),
@@ -24,7 +25,7 @@ function Admin() {
   const nav = useNavigate();
   const qc = useQueryClient();
   const [ready, setReady] = useState(false);
-  const [tab, setTab] = useState<"products"|"orders"|"tools"|"notifications">("products");
+  const [tab, setTab] = useState<"products"|"orders"|"media"|"tools"|"notifications">("products");
   const [search, setSearch] = useState("");
 
   useEffect(() => {
@@ -120,7 +121,7 @@ function Admin() {
           <h1 className="font-display text-4xl md:text-5xl font-black">Control room</h1>
         </div>
         <nav className="flex gap-1 rounded-full glass p-1 flex-wrap">
-          {(["products","orders","tools","notifications"] as const).map((t) => (
+          {(["products","orders","media","tools","notifications"] as const).map((t) => (
             <button key={t} onClick={()=>setTab(t)} className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest ${tab===t ? "bg-[color:var(--lime)] text-black font-bold" : "text-foreground/70 hover:text-foreground"}`}>{t}</button>
           ))}
         </nav>
@@ -246,6 +247,7 @@ function Admin() {
         </div>
       )}
 
+      {tab === "media" && <MediaManagerPanel />}
       {tab === "notifications" && <AdminNotificationsPanel />}
     </div>
   );
@@ -279,6 +281,7 @@ function AdminRow({ p, onPrice, onToggle, onAi, onEditName, onEditDesc, onDelete
         <Pill on={p.is_featured} onClick={()=>onToggle(p.id, { is_featured: !p.is_featured })}>Feat</Pill>
         <Pill on={p.is_best_seller} onClick={()=>onToggle(p.id, { is_best_seller: !p.is_best_seller })}>Best</Pill>
         <Pill on={p.is_new_drop} onClick={()=>onToggle(p.id, { is_new_drop: !p.is_new_drop })}>New</Pill>
+        <Pill on={!p.hide_colors} onClick={()=>onToggle(p.id, { hide_colors: !p.hide_colors })} title="Show color options to shoppers">Colors</Pill>
       </td>
       <td className="p-3">
         <select value={p.status} onChange={(e)=>onToggle(p.id, { status: e.target.value })} className="rounded-md bg-input/60 border border-border px-2 py-1 text-xs" aria-label={`Status for ${p.name}`}>
@@ -297,8 +300,8 @@ function AdminRow({ p, onPrice, onToggle, onAi, onEditName, onEditDesc, onDelete
   );
 }
 
-function Pill({ on, onClick, children }: any) {
-  return <button onClick={onClick} className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${on ? "bg-[color:var(--lime)] text-black" : "bg-muted text-muted-foreground"}`}>{children}</button>;
+function Pill({ on, onClick, children, title }: any) {
+  return <button onClick={onClick} title={title} className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${on ? "bg-[color:var(--lime)] text-black" : "bg-muted text-muted-foreground"}`}>{children}</button>;
 }
 
 function CreateProductButton({ onCreate }: { onCreate: (p: any) => void | Promise<void> }) {

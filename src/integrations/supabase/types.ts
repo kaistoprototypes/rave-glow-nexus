@@ -62,6 +62,7 @@ export type Database = {
           name: string
           position: number
           slug: string
+          video_url: string | null
         }
         Insert: {
           created_at?: string
@@ -72,6 +73,7 @@ export type Database = {
           name: string
           position?: number
           slug: string
+          video_url?: string | null
         }
         Update: {
           created_at?: string
@@ -82,6 +84,7 @@ export type Database = {
           name?: string
           position?: number
           slug?: string
+          video_url?: string | null
         }
         Relationships: []
       }
@@ -389,6 +392,7 @@ export type Database = {
           featured_image: string | null
           gallery: string[]
           gender: string
+          hide_colors: boolean
           id: string
           inventory: number
           is_best_seller: boolean
@@ -408,6 +412,7 @@ export type Database = {
           status: string
           tags: string[]
           updated_at: string
+          video_url: string | null
         }
         Insert: {
           category_slug?: string | null
@@ -422,6 +427,7 @@ export type Database = {
           featured_image?: string | null
           gallery?: string[]
           gender: string
+          hide_colors?: boolean
           id?: string
           inventory?: number
           is_best_seller?: boolean
@@ -441,6 +447,7 @@ export type Database = {
           status?: string
           tags?: string[]
           updated_at?: string
+          video_url?: string | null
         }
         Update: {
           category_slug?: string | null
@@ -455,6 +462,7 @@ export type Database = {
           featured_image?: string | null
           gallery?: string[]
           gender?: string
+          hide_colors?: boolean
           id?: string
           inventory?: number
           is_best_seller?: boolean
@@ -474,6 +482,7 @@ export type Database = {
           status?: string
           tags?: string[]
           updated_at?: string
+          video_url?: string | null
         }
         Relationships: []
       }

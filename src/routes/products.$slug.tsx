@@ -47,12 +47,23 @@ function ProductPage() {
   const sizes: string[] = p.sizes ?? [];
   const colors: string[] = p.colors ?? [];
 
+  const gallery: string[] = (p.gallery && p.gallery.length > 0)
+    ? p.gallery
+    : (p.featured_image ? [p.featured_image] : []);
+  const videoUrl: string | null = p.video_url ?? null;
+
+  type ActiveMedia = { kind: "image"; url: string } | { kind: "video"; url: string } | { kind: "art" };
+  const initialMedia: ActiveMedia = videoUrl
+    ? { kind: "video", url: videoUrl }
+    : (gallery[0] ? { kind: "image", url: gallery[0] } : { kind: "art" });
+  const [active, setActive] = useState<ActiveMedia>(initialMedia);
+
   const handleAdd = () => {
     if (sizes.length && !size) { toast.error("Pick a size"); return; }
-    if (colors.length && !color) { toast.error("Pick a color"); return; }
+    if (colors.length && !p.hide_colors && !color) { toast.error("Pick a color"); return; }
     add({
       productId: p.id, slug: p.slug, name: p.name, price, quantity: 1,
-      size: size ?? sizes[0], color: color ?? colors[0],
+      size: size ?? sizes[0], color: p.hide_colors ? undefined : (color ?? colors[0]),
       image_palette: p.color_palette,
     });
     toast.success(`${p.name} added`);
@@ -66,13 +77,42 @@ function ProductPage() {
       <div className="grid gap-10 md:grid-cols-2">
         <div className="space-y-4">
           <div className="aspect-square card-glow rounded-2xl overflow-hidden">
-            <ProductArt palette={p.color_palette} name={p.name} style={p.design_style ?? ""} className="h-full w-full" />
+            {active.kind === "video" ? (
+              <video src={active.url} controls autoPlay muted loop playsInline className="h-full w-full object-cover" />
+            ) : active.kind === "image" ? (
+              <img src={active.url} alt={p.name} className="h-full w-full object-cover" />
+            ) : (
+              <ProductArt palette={p.color_palette} name={p.name} style={p.design_style ?? ""} className="h-full w-full" />
+            )}
           </div>
           <div className="grid grid-cols-4 gap-3">
-            {[0,1,2,3].map((i) => (
-              <div key={i} className="aspect-square rounded-xl overflow-hidden border border-border/40">
+            {videoUrl && (
+              <button
+                onClick={() => setActive({ kind: "video", url: videoUrl })}
+                aria-label="Play hero video"
+                className={`relative aspect-square rounded-xl overflow-hidden border transition ${active.kind === "video" ? "border-[color:var(--lime)] ring-2 ring-[color:var(--lime)]/50" : "border-border/40 hover:border-[color:var(--cyan)]"}`}
+              >
+                <video src={videoUrl} muted className="h-full w-full object-cover" />
+                <span className="absolute inset-0 grid place-items-center bg-black/40 text-white text-[10px] font-bold uppercase">▶ Video</span>
+              </button>
+            )}
+            {gallery.length > 0 ? gallery.slice(0, videoUrl ? 3 : 4).map((url, i) => (
+              <button
+                key={url + i}
+                onClick={() => setActive({ kind: "image", url })}
+                aria-label={`View image ${i + 1}`}
+                className={`aspect-square rounded-xl overflow-hidden border transition ${active.kind === "image" && active.url === url ? "border-[color:var(--lime)] ring-2 ring-[color:var(--lime)]/50" : "border-border/40 hover:border-[color:var(--cyan)]"}`}
+              >
+                <img src={url} alt="" className="h-full w-full object-cover" />
+              </button>
+            )) : !videoUrl && [0,1,2,3].map((i) => (
+              <button
+                key={i}
+                onClick={() => setActive({ kind: "art" })}
+                className={`aspect-square rounded-xl overflow-hidden border ${active.kind === "art" ? "border-[color:var(--lime)] ring-2 ring-[color:var(--lime)]/50" : "border-border/40"}`}
+              >
                 <ProductArt palette={[...p.color_palette].reverse()} name={p.name + i} style={p.design_style ?? ""} className="h-full w-full" />
-              </div>
+              </button>
             ))}
           </div>
         </div>
@@ -103,7 +143,7 @@ function ProductPage() {
               </div>
             </div>
           )}
-          {colors.length > 0 && (
+          {colors.length > 0 && !p.hide_colors && (
             <div>
               <p className="text-xs uppercase tracking-widest text-muted-foreground mb-2">Color</p>
               <div className="flex flex-wrap gap-2">
