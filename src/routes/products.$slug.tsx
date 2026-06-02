@@ -47,12 +47,23 @@ function ProductPage() {
   const sizes: string[] = p.sizes ?? [];
   const colors: string[] = p.colors ?? [];
 
+  const gallery: string[] = (p.gallery && p.gallery.length > 0)
+    ? p.gallery
+    : (p.featured_image ? [p.featured_image] : []);
+  const videoUrl: string | null = p.video_url ?? null;
+
+  type ActiveMedia = { kind: "image"; url: string } | { kind: "video"; url: string } | { kind: "art" };
+  const initialMedia: ActiveMedia = videoUrl
+    ? { kind: "video", url: videoUrl }
+    : (gallery[0] ? { kind: "image", url: gallery[0] } : { kind: "art" });
+  const [active, setActive] = useState<ActiveMedia>(initialMedia);
+
   const handleAdd = () => {
     if (sizes.length && !size) { toast.error("Pick a size"); return; }
-    if (colors.length && !color) { toast.error("Pick a color"); return; }
+    if (colors.length && !p.hide_colors && !color) { toast.error("Pick a color"); return; }
     add({
       productId: p.id, slug: p.slug, name: p.name, price, quantity: 1,
-      size: size ?? sizes[0], color: color ?? colors[0],
+      size: size ?? sizes[0], color: p.hide_colors ? undefined : (color ?? colors[0]),
       image_palette: p.color_palette,
     });
     toast.success(`${p.name} added`);
