@@ -31,7 +31,7 @@ function Home() {
               <Sparkles className="h-3.5 w-3.5 text-[color:var(--lime)]" /> New cosmic carnival drop
             </div>
             <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-black leading-[0.95] tracking-tight">
-              Dressed for <span className="text-neon glow-lime">after dark.</span>
+              Dressed for <span className="animate-neon-pulse">after dark.</span>
             </h1>
             <p className="text-lg text-muted-foreground max-w-lg">
               Ninety original ravewear designs engineered for desert lights, bass nights, and electric weekends.

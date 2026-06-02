@@ -36,16 +36,45 @@ export const adminUpdateProduct = createServerFn({ method: "POST" })
       is_featured: z.boolean().optional(),
       is_best_seller: z.boolean().optional(),
       is_new_drop: z.boolean().optional(),
+      hide_colors: z.boolean().optional(),
       inventory: z.number().int().optional(),
       sold_count: z.number().int().min(0).max(1000000).optional(),
       product_type: z.string().optional(),
       gender: z.string().optional(),
       featured_image: z.string().nullable().optional(),
+      video_url: z.string().nullable().optional(),
+      gallery: z.array(z.string()).optional(),
     }),
   }))
   .handler(async ({ context, data }) => {
     await assertAdmin(context.userId);
     const { error } = await supabaseAdmin.from("products").update(data.patch).eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const adminListCategories = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.userId);
+    const { data, error } = await supabaseAdmin.from("categories").select("*").order("kind").order("position");
+    if (error) throw new Error(error.message);
+    return { categories: data ?? [] };
+  });
+
+export const adminUpdateCategory = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(z.object({
+    id: z.string().uuid(),
+    patch: z.object({
+      image_url: z.string().nullable().optional(),
+      video_url: z.string().nullable().optional(),
+      description: z.string().nullable().optional(),
+    }),
+  }))
+  .handler(async ({ context, data }) => {
+    await assertAdmin(context.userId);
+    const { error } = await supabaseAdmin.from("categories").update(data.patch).eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
