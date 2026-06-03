@@ -18,6 +18,7 @@ export type ProductCardData = {
   is_best_seller?: boolean;
   sizes?: string[];
   colors?: string[];
+  sold_count?: number | string;
 };
 
 export function ProductCard({ p }: { p: ProductCardData }) {
@@ -58,11 +59,11 @@ export function ProductCard({ p }: { p: ProductCardData }) {
           </div>
         </div>
         <div className="mt-3 flex items-center justify-between">
-          <div className="flex gap-1">
-            {p.color_palette.slice(0, 4).map((c, i) => (
-              <span key={i} className="h-3 w-3 rounded-full border border-white/20" style={{ background: c }} />
-            ))}
-          </div>
+          <span className="text-[11px] text-muted-foreground uppercase tracking-wider">
+            {p.sold_count && Number(p.sold_count) > 0 ? (
+              <><strong className="text-foreground">{Number(p.sold_count).toLocaleString()}</strong> sold</>
+            ) : null}
+          </span>
           <button
             onClick={() =>
               add({
