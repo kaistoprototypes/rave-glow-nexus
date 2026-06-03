@@ -18,6 +18,7 @@ export type ProductCardData = {
   is_best_seller?: boolean;
   sizes?: string[];
   colors?: string[];
+  sold_count?: number | string;
 };
 
 export function ProductCard({ p }: { p: ProductCardData }) {
