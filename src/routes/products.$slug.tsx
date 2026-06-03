@@ -146,16 +146,6 @@ function ProductPage() {
               </div>
             </div>
           )}
-          {colors.length > 0 && !p.hide_colors && (
-            <div>
-              <p className="text-xs uppercase tracking-widest text-muted-foreground mb-2">Color</p>
-              <div className="flex flex-wrap gap-2">
-                {colors.map((c) => (
-                  <button key={c} onClick={() => setColor(c)} className={`h-10 rounded-full border px-4 text-xs font-semibold capitalize transition ${color===c ? "border-[color:var(--lime)] bg-[color:var(--lime)]/10" : "border-border hover:border-[color:var(--cyan)]"}`}>{c}</button>
-                ))}
-              </div>
-            </div>
-          )}
 
           <div className="flex gap-3">
             <button onClick={() => { handleAdd(); open(); }} className="btn-neon flex-1 rounded-full py-3.5 text-sm">Add to bag — {money(price)}</button>
