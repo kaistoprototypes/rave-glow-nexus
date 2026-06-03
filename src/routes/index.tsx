@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getHomeData } from "@/lib/products.functions";
 import { ProductCard } from "@/components/ProductCard";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Sparkles, Zap, Flame, Music4 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -99,6 +100,8 @@ function Home() {
 }
 
 function Section({ title, subtitle, items, loading }: { title: string; subtitle: string; items: any[]; loading: boolean }) {
+  const isMobile = useIsMobile();
+  const maxItems = isMobile ? 4 : 8;
   return (
     <section className="px-4 py-14">
       <div className="mx-auto max-w-7xl">
@@ -109,9 +112,9 @@ function Section({ title, subtitle, items, loading }: { title: string; subtitle:
           </div>
           <Link to="/shop" className="text-xs uppercase tracking-widest text-[color:var(--cyan)] hover:text-[color:var(--lime)]">View all →</Link>
         </div>
-        {loading && <div className="grid grid-cols-2 md:grid-cols-4 gap-4">{Array.from({length:4}).map((_,i)=>(<div key={i} className="aspect-square rounded-2xl bg-muted/30 animate-pulse" />))}</div>}
+        {loading && <div className="grid grid-cols-2 md:grid-cols-4 gap-4">{Array.from({length: isMobile ? 4 : 4}).map((_,i)=>(<div key={i} className="aspect-square rounded-2xl bg-muted/30 animate-pulse" />))}</div>}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {items.slice(0, 8).map((p) => (<ProductCard key={p.id} p={p as any} />))}
+          {items.slice(0, maxItems).map((p) => (<ProductCard key={p.id} p={p as any} />))}
         </div>
       </div>
     </section>
