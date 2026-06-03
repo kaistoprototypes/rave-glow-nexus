@@ -19,20 +19,37 @@ export const Route = createFileRoute("/products/$slug")({
   }),
 });
 
+type ActiveMedia = { kind: "image"; url: string } | { kind: "video"; url: string } | { kind: "art" };
+
 function ProductPage() {
   const { slug } = Route.useParams();
   const add = useCart((s) => s.add);
   const open = useCart((s) => s.open);
   const [size, setSize] = useState<string | undefined>();
-  const [color, setColor] = useState<string | undefined>();
+  const [active, setActive] = useState<ActiveMedia>({ kind: "art" });
+  const [initedFor, setInitedFor] = useState<string>("");
 
   const { data, isLoading } = useQuery({
     queryKey: ["product", slug],
     queryFn: () => getProductBySlug({ data: { slug } }),
   });
 
+  const p = data?.product;
+  const gallery: string[] = p
+    ? ((p.gallery && p.gallery.length > 0) ? p.gallery : (p.featured_image ? [p.featured_image] : []))
+    : [];
+  const videoUrl: string | null = p?.video_url ?? null;
+
+  if (p && initedFor !== p.id) {
+    const initial: ActiveMedia = videoUrl
+      ? { kind: "video", url: videoUrl }
+      : (gallery[0] ? { kind: "image", url: gallery[0] } : { kind: "art" });
+    setActive(initial);
+    setInitedFor(p.id);
+  }
+
   if (isLoading) return <div className="mx-auto max-w-7xl px-4 py-20"><div className="h-96 rounded-2xl bg-muted/30 animate-pulse" /></div>;
-  if (!data?.product) {
+  if (!p) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20 text-center">
         <h1 className="text-4xl font-black">Drop not found</h1>
@@ -41,29 +58,15 @@ function ProductPage() {
     );
   }
 
-  const p = data.product;
   const price = Number(p.price);
   const compare = p.compare_at_price ? Number(p.compare_at_price) : null;
   const sizes: string[] = p.sizes ?? [];
-  const colors: string[] = p.colors ?? [];
-
-  const gallery: string[] = (p.gallery && p.gallery.length > 0)
-    ? p.gallery
-    : (p.featured_image ? [p.featured_image] : []);
-  const videoUrl: string | null = p.video_url ?? null;
-
-  type ActiveMedia = { kind: "image"; url: string } | { kind: "video"; url: string } | { kind: "art" };
-  const initialMedia: ActiveMedia = videoUrl
-    ? { kind: "video", url: videoUrl }
-    : (gallery[0] ? { kind: "image", url: gallery[0] } : { kind: "art" });
-  const [active, setActive] = useState<ActiveMedia>(initialMedia);
 
   const handleAdd = () => {
     if (sizes.length && !size) { toast.error("Pick a size"); return; }
-    if (colors.length && !p.hide_colors && !color) { toast.error("Pick a color"); return; }
     add({
       productId: p.id, slug: p.slug, name: p.name, price, quantity: 1,
-      size: size ?? sizes[0], color: p.hide_colors ? undefined : (color ?? colors[0]),
+      size: size ?? sizes[0],
       image_palette: p.color_palette,
     });
     toast.success(`${p.name} added`);
@@ -139,16 +142,6 @@ function ProductPage() {
               <div className="flex flex-wrap gap-2">
                 {sizes.map((s) => (
                   <button key={s} onClick={() => setSize(s)} className={`h-10 min-w-10 rounded-full border px-3 text-xs font-semibold uppercase tracking-wider transition ${size===s ? "border-[color:var(--lime)] bg-[color:var(--lime)]/10 text-[color:var(--lime)]" : "border-border hover:border-[color:var(--cyan)]"}`}>{s}</button>
-                ))}
-              </div>
-            </div>
-          )}
-          {colors.length > 0 && !p.hide_colors && (
-            <div>
-              <p className="text-xs uppercase tracking-widest text-muted-foreground mb-2">Color</p>
-              <div className="flex flex-wrap gap-2">
-                {colors.map((c) => (
-                  <button key={c} onClick={() => setColor(c)} className={`h-10 rounded-full border px-4 text-xs font-semibold capitalize transition ${color===c ? "border-[color:var(--lime)] bg-[color:var(--lime)]/10" : "border-border hover:border-[color:var(--cyan)]"}`}>{c}</button>
                 ))}
               </div>
             </div>

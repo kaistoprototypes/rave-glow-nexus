@@ -19,9 +19,10 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-40 glass border-b border-border/40">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-8">
-        <Link to="/" className="flex items-center gap-2 text-base sm:text-lg font-display font-black tracking-tight min-w-0">
-          <Sparkles className="h-5 w-5 text-[color:var(--lime)] glow-lime shrink-0" />
-          <span className="animate-neon-pulse truncate">
+        <Link to="/" className="relative flex items-center gap-2 text-base sm:text-lg font-display font-black tracking-tight min-w-0">
+          <span aria-hidden className="pointer-events-none absolute -inset-3 rounded-full bg-[color:var(--lime)]/25 blur-2xl animate-neon-pulse-bg" />
+          <Sparkles className="relative h-5 w-5 text-[color:var(--lime)] shrink-0" />
+          <span className="relative truncate text-[color:var(--lime)]">
             ELECTRIC PULSE <span className="hidden sm:inline">EMPORIUM</span>
           </span>
         </Link>
