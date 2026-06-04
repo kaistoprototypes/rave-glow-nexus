@@ -519,6 +519,45 @@ export type Database = {
         }
         Relationships: []
       }
+      promotions: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          ends_at: string
+          flat_amount: number | null
+          id: string
+          kind: string
+          name: string
+          priority: number
+          starts_at: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          ends_at: string
+          flat_amount?: number | null
+          id?: string
+          kind: string
+          name: string
+          priority?: number
+          starts_at: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          ends_at?: string
+          flat_amount?: number | null
+          id?: string
+          kind?: string
+          name?: string
+          priority?: number
+          starts_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       reviews: {
         Row: {
           body: string | null
@@ -560,6 +599,36 @@ export type Database = {
           },
         ]
       }
+      signup_rewards: {
+        Row: {
+          code: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          percent_off: number
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          percent_off?: number
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          percent_off?: number
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           key: string
@@ -599,6 +668,24 @@ export type Database = {
           payload?: Json
           processed_at?: string | null
           type?: string
+        }
+        Relationships: []
+      }
+      user_carts: {
+        Row: {
+          items: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          items?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          items?: Json
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

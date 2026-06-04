@@ -1,8 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useCart } from "@/lib/cart-store";
 import { ProductArt } from "@/components/ProductArt";
 import { money } from "@/lib/format";
-import { Minus, Plus, Trash2 } from "lucide-react";
+import { Minus, Plus, Trash2, Lock, Sparkles } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { listActivePromotions } from "@/lib/promotions.functions";
+import { computeDiscount, findActivePromotion, type Promotion } from "@/lib/promotions";
 
 export const Route = createFileRoute("/cart")({
   head: () => ({ meta: [{ title: "Your bag — Electric Pulse Emporium" }] }),
@@ -12,8 +18,23 @@ export const Route = createFileRoute("/cart")({
 function Cart() {
   const { items, setQty, remove, subtotal } = useCart();
   const nav = useNavigate();
-  const shipping = subtotal() > 80 || items.length === 0 ? 0 : 9;
-  const total = subtotal() + shipping;
+  const [isAuthed, setIsAuthed] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setIsAuthed(!!data.user));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => setIsAuthed(!!s));
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const promosFn = useServerFn(listActivePromotions);
+  const { data: promoData } = useQuery({ queryKey: ["active-promotions"], queryFn: () => promosFn() });
+  const activePromo = findActivePromotion((promoData?.promotions ?? []) as Promotion[]);
+  const discount = computeDiscount(items, activePromo, isAuthed);
+
+  const sub = subtotal();
+  const appliedDiscount = isAuthed ? discount.amount : 0;
+  const shipping = sub - appliedDiscount > 80 || items.length === 0 ? 0 : 9;
+  const total = Math.max(0, sub - appliedDiscount + shipping);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
@@ -51,12 +72,39 @@ function Cart() {
           </div>
           <aside className="card-glow rounded-2xl p-6 h-fit space-y-4">
             <h3 className="font-display text-lg font-bold uppercase tracking-widest">Summary</h3>
-            <Row label="Subtotal" value={money(subtotal())} />
+            <Row label="Subtotal" value={money(sub)} />
+            {discount.amount > 0 && (
+              <div className={`rounded-lg border p-3 text-xs ${isAuthed ? "border-[color:var(--lime)]/40 bg-[color:var(--lime)]/10" : "border-[color:var(--magenta)]/40 bg-[color:var(--magenta)]/10"}`}>
+                <div className="flex items-center gap-2 font-bold uppercase tracking-widest mb-1">
+                  <Sparkles className="h-3 w-3" /> {discount.label}
+                </div>
+                {isAuthed ? (
+                  <p className="text-[color:var(--lime)] font-bold">You save {money(discount.amount)}</p>
+                ) : (
+                  <p className="text-muted-foreground">
+                    <Lock className="inline h-3 w-3 mr-1" />
+                    <Link to="/login" search={{ redirect: "/cart" } as any} className="underline text-[color:var(--magenta)]">Sign in</Link> to unlock {money(discount.amount)} off
+                  </p>
+                )}
+              </div>
+            )}
+            {isAuthed && appliedDiscount > 0 && <Row label="Discount" value={`− ${money(appliedDiscount)}`} />}
             <Row label="Shipping" value={shipping === 0 ? "Free" : money(shipping)} />
             <div className="border-t border-border/40 pt-3 flex justify-between text-lg font-bold">
               <span>Total</span><span className="text-[color:var(--lime)] glow-lime">{money(total)}</span>
             </div>
-            <button onClick={() => nav({ to: "/checkout" })} className="btn-neon w-full rounded-full py-3 text-sm">Checkout</button>
+            <button
+              onClick={() => {
+                if (!isAuthed && discount.amount > 0) {
+                  nav({ to: "/login", search: { redirect: "/checkout" } as any });
+                } else {
+                  nav({ to: "/checkout" });
+                }
+              }}
+              className="btn-neon w-full rounded-full py-3 text-sm"
+            >
+              {!isAuthed && discount.amount > 0 ? "Sign in to checkout" : "Checkout"}
+            </button>
           </aside>
         </div>
       )}
