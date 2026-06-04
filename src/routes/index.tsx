@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getHomeData } from "@/lib/products.functions";
 import { ProductCard } from "@/components/ProductCard";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { PromoBanner } from "@/components/PromoBanner";
 import { Sparkles, Zap, Flame, Music4 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -25,6 +26,7 @@ function Home() {
 
   return (
     <>
+      <PromoBanner />
       <section className="relative overflow-hidden px-4 pt-10 pb-20 md:pt-20 md:pb-32">
         <div className="mx-auto max-w-7xl grid items-center gap-10 md:grid-cols-2">
           <div className="space-y-7 animate-fade-up">
