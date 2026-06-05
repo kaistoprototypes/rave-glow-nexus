@@ -292,8 +292,12 @@ export type Database = {
           subtotal: number
           tax: number
           total: number
+          tracking_number: string | null
+          tracking_url: string | null
           updated_at: string
           user_id: string | null
+          yoycol_order_id: string | null
+          yoycol_status: string | null
         }
         Insert: {
           coupon_code?: string | null
@@ -312,8 +316,12 @@ export type Database = {
           subtotal?: number
           tax?: number
           total?: number
+          tracking_number?: string | null
+          tracking_url?: string | null
           updated_at?: string
           user_id?: string | null
+          yoycol_order_id?: string | null
+          yoycol_status?: string | null
         }
         Update: {
           coupon_code?: string | null
@@ -332,8 +340,12 @@ export type Database = {
           subtotal?: number
           tax?: number
           total?: number
+          tracking_number?: string | null
+          tracking_url?: string | null
           updated_at?: string
           user_id?: string | null
+          yoycol_order_id?: string | null
+          yoycol_status?: string | null
         }
         Relationships: []
       }
@@ -738,6 +750,132 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      yoycol_orders: {
+        Row: {
+          carrier: string | null
+          created_at: string
+          delivered_at: string | null
+          id: string
+          last_error: string | null
+          order_id: string
+          request_payload: Json | null
+          response_payload: Json | null
+          shipped_at: string | null
+          status: string
+          tracking_number: string | null
+          tracking_url: string | null
+          updated_at: string
+          yoycol_order_id: string | null
+          yoycol_order_no: string | null
+        }
+        Insert: {
+          carrier?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          id?: string
+          last_error?: string | null
+          order_id: string
+          request_payload?: Json | null
+          response_payload?: Json | null
+          shipped_at?: string | null
+          status?: string
+          tracking_number?: string | null
+          tracking_url?: string | null
+          updated_at?: string
+          yoycol_order_id?: string | null
+          yoycol_order_no?: string | null
+        }
+        Update: {
+          carrier?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          id?: string
+          last_error?: string | null
+          order_id?: string
+          request_payload?: Json | null
+          response_payload?: Json | null
+          shipped_at?: string | null
+          status?: string
+          tracking_number?: string | null
+          tracking_url?: string | null
+          updated_at?: string
+          yoycol_order_id?: string | null
+          yoycol_order_no?: string | null
+        }
+        Relationships: []
+      }
+      yoycol_product_mappings: {
+        Row: {
+          cover_image: string | null
+          created_at: string
+          id: string
+          last_synced_at: string | null
+          placements: Json
+          product_id: string
+          spu_code: string
+          sync_direction: string
+          template_name: string | null
+          updated_at: string
+          variant_map: Json
+        }
+        Insert: {
+          cover_image?: string | null
+          created_at?: string
+          id?: string
+          last_synced_at?: string | null
+          placements?: Json
+          product_id: string
+          spu_code: string
+          sync_direction?: string
+          template_name?: string | null
+          updated_at?: string
+          variant_map?: Json
+        }
+        Update: {
+          cover_image?: string | null
+          created_at?: string
+          id?: string
+          last_synced_at?: string | null
+          placements?: Json
+          product_id?: string
+          spu_code?: string
+          sync_direction?: string
+          template_name?: string | null
+          updated_at?: string
+          variant_map?: Json
+        }
+        Relationships: []
+      }
+      yoycol_webhook_events: {
+        Row: {
+          created_at: string
+          error: string | null
+          event_type: string | null
+          external_id: string | null
+          id: string
+          payload: Json
+          processed_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          event_type?: string | null
+          external_id?: string | null
+          id?: string
+          payload: Json
+          processed_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          event_type?: string | null
+          external_id?: string | null
+          id?: string
+          payload?: Json
+          processed_at?: string | null
+        }
+        Relationships: []
       }
     }
     Views: {
