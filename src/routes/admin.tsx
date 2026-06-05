@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { AdminNotificationsPanel } from "@/components/AdminNotificationsPanel";
 import { MediaManagerPanel } from "@/components/MediaManagerPanel";
 import { PromotionsPanel } from "@/components/admin/PromotionsPanel";
+import { YoycolPanel } from "@/components/admin/YoycolPanel";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin — Electric Pulse Emporium" }] }),
@@ -26,7 +27,7 @@ function Admin() {
   const nav = useNavigate();
   const qc = useQueryClient();
   const [ready, setReady] = useState(false);
-  const [tab, setTab] = useState<"products"|"orders"|"media"|"tools"|"promotions"|"notifications">("products");
+  const [tab, setTab] = useState<"products"|"orders"|"media"|"tools"|"promotions"|"yoycol"|"notifications">("products");
   const [search, setSearch] = useState("");
 
   useEffect(() => {
@@ -122,7 +123,7 @@ function Admin() {
           <h1 className="font-display text-4xl md:text-5xl font-black">Control room</h1>
         </div>
         <nav className="flex gap-1 rounded-full glass p-1 flex-wrap">
-          {(["products","orders","media","tools","promotions","notifications"] as const).map((t) => (
+          {(["products","orders","media","tools","promotions","yoycol","notifications"] as const).map((t) => (
             <button key={t} onClick={()=>setTab(t)} className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest ${tab===t ? "bg-[color:var(--lime)] text-black font-bold" : "text-foreground/70 hover:text-foreground"}`}>{t}</button>
           ))}
         </nav>
@@ -250,6 +251,7 @@ function Admin() {
 
       {tab === "media" && <MediaManagerPanel />}
       {tab === "promotions" && <PromotionsPanel />}
+      {tab === "yoycol" && <YoycolPanel />}
       {tab === "notifications" && <AdminNotificationsPanel />}
     </div>
   );
