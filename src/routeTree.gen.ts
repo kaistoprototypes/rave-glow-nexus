@@ -19,6 +19,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductsSlugRouteImport } from './routes/products.$slug'
 import { Route as OrderSuccessRouteImport } from './routes/order.success'
 import { Route as OrderCancelRouteImport } from './routes/order.cancel'
+import { Route as ApiPublicYoycolSyncRouteImport } from './routes/api/public/yoycol-sync'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 
 const ShopRoute = ShopRouteImport.update({
@@ -71,6 +72,11 @@ const OrderCancelRoute = OrderCancelRouteImport.update({
   path: '/order/cancel',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicYoycolSyncRoute = ApiPublicYoycolSyncRouteImport.update({
+  id: '/api/public/yoycol-sync',
+  path: '/api/public/yoycol-sync',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
   id: '/api/public/stripe-webhook',
   path: '/api/public/stripe-webhook',
@@ -89,6 +95,7 @@ export interface FileRoutesByFullPath {
   '/order/success': typeof OrderSuccessRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
+  '/api/public/yoycol-sync': typeof ApiPublicYoycolSyncRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -102,6 +109,7 @@ export interface FileRoutesByTo {
   '/order/success': typeof OrderSuccessRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
+  '/api/public/yoycol-sync': typeof ApiPublicYoycolSyncRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/order/success': typeof OrderSuccessRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
+  '/api/public/yoycol-sync': typeof ApiPublicYoycolSyncRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
     | '/order/success'
     | '/products/$slug'
     | '/api/public/stripe-webhook'
+    | '/api/public/yoycol-sync'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
     | '/order/success'
     | '/products/$slug'
     | '/api/public/stripe-webhook'
+    | '/api/public/yoycol-sync'
   id:
     | '__root__'
     | '/'
@@ -157,6 +168,7 @@ export interface FileRouteTypes {
     | '/order/success'
     | '/products/$slug'
     | '/api/public/stripe-webhook'
+    | '/api/public/yoycol-sync'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -171,6 +183,7 @@ export interface RootRouteChildren {
   OrderSuccessRoute: typeof OrderSuccessRoute
   ProductsSlugRoute: typeof ProductsSlugRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
+  ApiPublicYoycolSyncRoute: typeof ApiPublicYoycolSyncRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -245,6 +258,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrderCancelRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/yoycol-sync': {
+      id: '/api/public/yoycol-sync'
+      path: '/api/public/yoycol-sync'
+      fullPath: '/api/public/yoycol-sync'
+      preLoaderRoute: typeof ApiPublicYoycolSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/stripe-webhook': {
       id: '/api/public/stripe-webhook'
       path: '/api/public/stripe-webhook'
@@ -267,7 +287,18 @@ const rootRouteChildren: RootRouteChildren = {
   OrderSuccessRoute: OrderSuccessRoute,
   ProductsSlugRoute: ProductsSlugRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
+  ApiPublicYoycolSyncRoute: ApiPublicYoycolSyncRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
