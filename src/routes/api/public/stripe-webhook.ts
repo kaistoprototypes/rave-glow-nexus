@@ -40,6 +40,18 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
             stripe_customer_id: typeof session.customer === "string" ? session.customer : null,
             shipping_address: (session as any).shipping_details ?? (session as any).collected_information?.shipping_details ?? null,
           }).eq("stripe_session_id", session.id);
+
+          // Auto-create Yoycol fulfillment order
+          const { data: ord } = await supabaseAdmin
+            .from("orders").select("id").eq("stripe_session_id", session.id).maybeSingle();
+          if (ord?.id) {
+            try {
+              const { submitOrderToYoycolServerSide } = await import("@/lib/yoycol.functions");
+              await submitOrderToYoycolServerSide(ord.id);
+            } catch (e) {
+              console.error("Yoycol submit failed", e);
+            }
+          }
         }
 
         await supabaseAdmin.from("stripe_webhook_events").update({ processed_at: new Date().toISOString() }).eq("id", event.id);
