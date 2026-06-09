@@ -21,6 +21,12 @@ import { Route as OrderSuccessRouteImport } from './routes/order.success'
 import { Route as OrderCancelRouteImport } from './routes/order.cancel'
 import { Route as ApiPublicYoycolSyncRouteImport } from './routes/api/public/yoycol-sync'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
+import { Route as ApiPublicShopifyWebhooksProductsUpdateRouteImport } from './routes/api/public/shopify/webhooks/products-update'
+import { Route as ApiPublicShopifyWebhooksProductsDeleteRouteImport } from './routes/api/public/shopify/webhooks/products-delete'
+import { Route as ApiPublicShopifyWebhooksProductsCreateRouteImport } from './routes/api/public/shopify/webhooks/products-create'
+import { Route as ApiPublicShopifyWebhooksOrdersUpdateRouteImport } from './routes/api/public/shopify/webhooks/orders-update'
+import { Route as ApiPublicShopifyWebhooksOrdersCreateRouteImport } from './routes/api/public/shopify/webhooks/orders-create'
+import { Route as ApiPublicShopifyWebhooksOrdersCancelledRouteImport } from './routes/api/public/shopify/webhooks/orders-cancelled'
 
 const ShopRoute = ShopRouteImport.update({
   id: '/shop',
@@ -82,6 +88,42 @@ const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
   path: '/api/public/stripe-webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicShopifyWebhooksProductsUpdateRoute =
+  ApiPublicShopifyWebhooksProductsUpdateRouteImport.update({
+    id: '/api/public/shopify/webhooks/products-update',
+    path: '/api/public/shopify/webhooks/products-update',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicShopifyWebhooksProductsDeleteRoute =
+  ApiPublicShopifyWebhooksProductsDeleteRouteImport.update({
+    id: '/api/public/shopify/webhooks/products-delete',
+    path: '/api/public/shopify/webhooks/products-delete',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicShopifyWebhooksProductsCreateRoute =
+  ApiPublicShopifyWebhooksProductsCreateRouteImport.update({
+    id: '/api/public/shopify/webhooks/products-create',
+    path: '/api/public/shopify/webhooks/products-create',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicShopifyWebhooksOrdersUpdateRoute =
+  ApiPublicShopifyWebhooksOrdersUpdateRouteImport.update({
+    id: '/api/public/shopify/webhooks/orders-update',
+    path: '/api/public/shopify/webhooks/orders-update',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicShopifyWebhooksOrdersCreateRoute =
+  ApiPublicShopifyWebhooksOrdersCreateRouteImport.update({
+    id: '/api/public/shopify/webhooks/orders-create',
+    path: '/api/public/shopify/webhooks/orders-create',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicShopifyWebhooksOrdersCancelledRoute =
+  ApiPublicShopifyWebhooksOrdersCancelledRouteImport.update({
+    id: '/api/public/shopify/webhooks/orders-cancelled',
+    path: '/api/public/shopify/webhooks/orders-cancelled',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -96,6 +138,12 @@ export interface FileRoutesByFullPath {
   '/products/$slug': typeof ProductsSlugRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/yoycol-sync': typeof ApiPublicYoycolSyncRoute
+  '/api/public/shopify/webhooks/orders-cancelled': typeof ApiPublicShopifyWebhooksOrdersCancelledRoute
+  '/api/public/shopify/webhooks/orders-create': typeof ApiPublicShopifyWebhooksOrdersCreateRoute
+  '/api/public/shopify/webhooks/orders-update': typeof ApiPublicShopifyWebhooksOrdersUpdateRoute
+  '/api/public/shopify/webhooks/products-create': typeof ApiPublicShopifyWebhooksProductsCreateRoute
+  '/api/public/shopify/webhooks/products-delete': typeof ApiPublicShopifyWebhooksProductsDeleteRoute
+  '/api/public/shopify/webhooks/products-update': typeof ApiPublicShopifyWebhooksProductsUpdateRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -110,6 +158,12 @@ export interface FileRoutesByTo {
   '/products/$slug': typeof ProductsSlugRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/yoycol-sync': typeof ApiPublicYoycolSyncRoute
+  '/api/public/shopify/webhooks/orders-cancelled': typeof ApiPublicShopifyWebhooksOrdersCancelledRoute
+  '/api/public/shopify/webhooks/orders-create': typeof ApiPublicShopifyWebhooksOrdersCreateRoute
+  '/api/public/shopify/webhooks/orders-update': typeof ApiPublicShopifyWebhooksOrdersUpdateRoute
+  '/api/public/shopify/webhooks/products-create': typeof ApiPublicShopifyWebhooksProductsCreateRoute
+  '/api/public/shopify/webhooks/products-delete': typeof ApiPublicShopifyWebhooksProductsDeleteRoute
+  '/api/public/shopify/webhooks/products-update': typeof ApiPublicShopifyWebhooksProductsUpdateRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -125,6 +179,12 @@ export interface FileRoutesById {
   '/products/$slug': typeof ProductsSlugRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/yoycol-sync': typeof ApiPublicYoycolSyncRoute
+  '/api/public/shopify/webhooks/orders-cancelled': typeof ApiPublicShopifyWebhooksOrdersCancelledRoute
+  '/api/public/shopify/webhooks/orders-create': typeof ApiPublicShopifyWebhooksOrdersCreateRoute
+  '/api/public/shopify/webhooks/orders-update': typeof ApiPublicShopifyWebhooksOrdersUpdateRoute
+  '/api/public/shopify/webhooks/products-create': typeof ApiPublicShopifyWebhooksProductsCreateRoute
+  '/api/public/shopify/webhooks/products-delete': typeof ApiPublicShopifyWebhooksProductsDeleteRoute
+  '/api/public/shopify/webhooks/products-update': typeof ApiPublicShopifyWebhooksProductsUpdateRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -141,6 +201,12 @@ export interface FileRouteTypes {
     | '/products/$slug'
     | '/api/public/stripe-webhook'
     | '/api/public/yoycol-sync'
+    | '/api/public/shopify/webhooks/orders-cancelled'
+    | '/api/public/shopify/webhooks/orders-create'
+    | '/api/public/shopify/webhooks/orders-update'
+    | '/api/public/shopify/webhooks/products-create'
+    | '/api/public/shopify/webhooks/products-delete'
+    | '/api/public/shopify/webhooks/products-update'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -155,6 +221,12 @@ export interface FileRouteTypes {
     | '/products/$slug'
     | '/api/public/stripe-webhook'
     | '/api/public/yoycol-sync'
+    | '/api/public/shopify/webhooks/orders-cancelled'
+    | '/api/public/shopify/webhooks/orders-create'
+    | '/api/public/shopify/webhooks/orders-update'
+    | '/api/public/shopify/webhooks/products-create'
+    | '/api/public/shopify/webhooks/products-delete'
+    | '/api/public/shopify/webhooks/products-update'
   id:
     | '__root__'
     | '/'
@@ -169,6 +241,12 @@ export interface FileRouteTypes {
     | '/products/$slug'
     | '/api/public/stripe-webhook'
     | '/api/public/yoycol-sync'
+    | '/api/public/shopify/webhooks/orders-cancelled'
+    | '/api/public/shopify/webhooks/orders-create'
+    | '/api/public/shopify/webhooks/orders-update'
+    | '/api/public/shopify/webhooks/products-create'
+    | '/api/public/shopify/webhooks/products-delete'
+    | '/api/public/shopify/webhooks/products-update'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -184,6 +262,12 @@ export interface RootRouteChildren {
   ProductsSlugRoute: typeof ProductsSlugRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
   ApiPublicYoycolSyncRoute: typeof ApiPublicYoycolSyncRoute
+  ApiPublicShopifyWebhooksOrdersCancelledRoute: typeof ApiPublicShopifyWebhooksOrdersCancelledRoute
+  ApiPublicShopifyWebhooksOrdersCreateRoute: typeof ApiPublicShopifyWebhooksOrdersCreateRoute
+  ApiPublicShopifyWebhooksOrdersUpdateRoute: typeof ApiPublicShopifyWebhooksOrdersUpdateRoute
+  ApiPublicShopifyWebhooksProductsCreateRoute: typeof ApiPublicShopifyWebhooksProductsCreateRoute
+  ApiPublicShopifyWebhooksProductsDeleteRoute: typeof ApiPublicShopifyWebhooksProductsDeleteRoute
+  ApiPublicShopifyWebhooksProductsUpdateRoute: typeof ApiPublicShopifyWebhooksProductsUpdateRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -272,6 +356,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicStripeWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/shopify/webhooks/products-update': {
+      id: '/api/public/shopify/webhooks/products-update'
+      path: '/api/public/shopify/webhooks/products-update'
+      fullPath: '/api/public/shopify/webhooks/products-update'
+      preLoaderRoute: typeof ApiPublicShopifyWebhooksProductsUpdateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/shopify/webhooks/products-delete': {
+      id: '/api/public/shopify/webhooks/products-delete'
+      path: '/api/public/shopify/webhooks/products-delete'
+      fullPath: '/api/public/shopify/webhooks/products-delete'
+      preLoaderRoute: typeof ApiPublicShopifyWebhooksProductsDeleteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/shopify/webhooks/products-create': {
+      id: '/api/public/shopify/webhooks/products-create'
+      path: '/api/public/shopify/webhooks/products-create'
+      fullPath: '/api/public/shopify/webhooks/products-create'
+      preLoaderRoute: typeof ApiPublicShopifyWebhooksProductsCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/shopify/webhooks/orders-update': {
+      id: '/api/public/shopify/webhooks/orders-update'
+      path: '/api/public/shopify/webhooks/orders-update'
+      fullPath: '/api/public/shopify/webhooks/orders-update'
+      preLoaderRoute: typeof ApiPublicShopifyWebhooksOrdersUpdateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/shopify/webhooks/orders-create': {
+      id: '/api/public/shopify/webhooks/orders-create'
+      path: '/api/public/shopify/webhooks/orders-create'
+      fullPath: '/api/public/shopify/webhooks/orders-create'
+      preLoaderRoute: typeof ApiPublicShopifyWebhooksOrdersCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/shopify/webhooks/orders-cancelled': {
+      id: '/api/public/shopify/webhooks/orders-cancelled'
+      path: '/api/public/shopify/webhooks/orders-cancelled'
+      fullPath: '/api/public/shopify/webhooks/orders-cancelled'
+      preLoaderRoute: typeof ApiPublicShopifyWebhooksOrdersCancelledRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -288,6 +414,18 @@ const rootRouteChildren: RootRouteChildren = {
   ProductsSlugRoute: ProductsSlugRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
   ApiPublicYoycolSyncRoute: ApiPublicYoycolSyncRoute,
+  ApiPublicShopifyWebhooksOrdersCancelledRoute:
+    ApiPublicShopifyWebhooksOrdersCancelledRoute,
+  ApiPublicShopifyWebhooksOrdersCreateRoute:
+    ApiPublicShopifyWebhooksOrdersCreateRoute,
+  ApiPublicShopifyWebhooksOrdersUpdateRoute:
+    ApiPublicShopifyWebhooksOrdersUpdateRoute,
+  ApiPublicShopifyWebhooksProductsCreateRoute:
+    ApiPublicShopifyWebhooksProductsCreateRoute,
+  ApiPublicShopifyWebhooksProductsDeleteRoute:
+    ApiPublicShopifyWebhooksProductsDeleteRoute,
+  ApiPublicShopifyWebhooksProductsUpdateRoute:
+    ApiPublicShopifyWebhooksProductsUpdateRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
