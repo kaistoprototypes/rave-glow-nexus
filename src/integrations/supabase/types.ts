@@ -611,6 +611,68 @@ export type Database = {
           },
         ]
       }
+      shopify_order_line_items: {
+        Row: {
+          created_at: string
+          fulfillment_status: string | null
+          id: string
+          price: number | null
+          quantity: number | null
+          raw: Json
+          shopify_line_item_id: string
+          shopify_order_id: string
+          shopify_product_id: string | null
+          shopify_variant_id: string | null
+          sku: string | null
+          title: string | null
+          total_discount: number | null
+          variant_title: string | null
+          vendor: string | null
+        }
+        Insert: {
+          created_at?: string
+          fulfillment_status?: string | null
+          id?: string
+          price?: number | null
+          quantity?: number | null
+          raw: Json
+          shopify_line_item_id: string
+          shopify_order_id: string
+          shopify_product_id?: string | null
+          shopify_variant_id?: string | null
+          sku?: string | null
+          title?: string | null
+          total_discount?: number | null
+          variant_title?: string | null
+          vendor?: string | null
+        }
+        Update: {
+          created_at?: string
+          fulfillment_status?: string | null
+          id?: string
+          price?: number | null
+          quantity?: number | null
+          raw?: Json
+          shopify_line_item_id?: string
+          shopify_order_id?: string
+          shopify_product_id?: string | null
+          shopify_variant_id?: string | null
+          sku?: string | null
+          title?: string | null
+          total_discount?: number | null
+          variant_title?: string | null
+          vendor?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shopify_order_line_items_shopify_order_id_fkey"
+            columns: ["shopify_order_id"]
+            isOneToOne: false
+            referencedRelation: "shopify_orders"
+            referencedColumns: ["shopify_order_id"]
+          },
+        ]
+      }
       shopify_orders: {
         Row: {
           billing_address: Json | null
@@ -676,6 +738,71 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      shopify_product_variants: {
+        Row: {
+          available: boolean | null
+          compare_at_price: number | null
+          created_at: string
+          id: string
+          inventory_quantity: number | null
+          option1: string | null
+          option2: string | null
+          option3: string | null
+          position: number | null
+          price: number | null
+          raw: Json
+          shopify_product_id: string
+          shopify_variant_id: string
+          sku: string | null
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          available?: boolean | null
+          compare_at_price?: number | null
+          created_at?: string
+          id?: string
+          inventory_quantity?: number | null
+          option1?: string | null
+          option2?: string | null
+          option3?: string | null
+          position?: number | null
+          price?: number | null
+          raw: Json
+          shopify_product_id: string
+          shopify_variant_id: string
+          sku?: string | null
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          available?: boolean | null
+          compare_at_price?: number | null
+          created_at?: string
+          id?: string
+          inventory_quantity?: number | null
+          option1?: string | null
+          option2?: string | null
+          option3?: string | null
+          position?: number | null
+          price?: number | null
+          raw?: Json
+          shopify_product_id?: string
+          shopify_variant_id?: string
+          sku?: string | null
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shopify_product_variants_shopify_product_id_fkey"
+            columns: ["shopify_product_id"]
+            isOneToOne: false
+            referencedRelation: "shopify_products"
+            referencedColumns: ["shopify_product_id"]
+          },
+        ]
       }
       shopify_products: {
         Row: {
