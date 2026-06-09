@@ -611,6 +611,174 @@ export type Database = {
           },
         ]
       }
+      shopify_orders: {
+        Row: {
+          billing_address: Json | null
+          cancel_reason: string | null
+          cancelled_at: string | null
+          created_at: string
+          currency: string | null
+          customer: Json | null
+          email: string | null
+          financial_status: string | null
+          fulfillment_status: string | null
+          id: string
+          line_items: Json
+          order_number: string | null
+          raw: Json
+          shipping_address: Json | null
+          shopify_created_at: string | null
+          shopify_order_id: string
+          shopify_updated_at: string | null
+          total_price: number | null
+          updated_at: string
+        }
+        Insert: {
+          billing_address?: Json | null
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          created_at?: string
+          currency?: string | null
+          customer?: Json | null
+          email?: string | null
+          financial_status?: string | null
+          fulfillment_status?: string | null
+          id?: string
+          line_items?: Json
+          order_number?: string | null
+          raw: Json
+          shipping_address?: Json | null
+          shopify_created_at?: string | null
+          shopify_order_id: string
+          shopify_updated_at?: string | null
+          total_price?: number | null
+          updated_at?: string
+        }
+        Update: {
+          billing_address?: Json | null
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          created_at?: string
+          currency?: string | null
+          customer?: Json | null
+          email?: string | null
+          financial_status?: string | null
+          fulfillment_status?: string | null
+          id?: string
+          line_items?: Json
+          order_number?: string | null
+          raw?: Json
+          shipping_address?: Json | null
+          shopify_created_at?: string | null
+          shopify_order_id?: string
+          shopify_updated_at?: string | null
+          total_price?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      shopify_products: {
+        Row: {
+          compare_at_price: number | null
+          created_at: string
+          deleted_at: string | null
+          description: string | null
+          handle: string | null
+          id: string
+          images: Json
+          max_price: number | null
+          min_price: number | null
+          product_type: string | null
+          raw: Json
+          shopify_created_at: string | null
+          shopify_product_id: string
+          shopify_updated_at: string | null
+          status: string | null
+          tags: string[] | null
+          title: string | null
+          total_inventory: number | null
+          updated_at: string
+          variants: Json
+          vendor: string | null
+        }
+        Insert: {
+          compare_at_price?: number | null
+          created_at?: string
+          deleted_at?: string | null
+          description?: string | null
+          handle?: string | null
+          id?: string
+          images?: Json
+          max_price?: number | null
+          min_price?: number | null
+          product_type?: string | null
+          raw: Json
+          shopify_created_at?: string | null
+          shopify_product_id: string
+          shopify_updated_at?: string | null
+          status?: string | null
+          tags?: string[] | null
+          title?: string | null
+          total_inventory?: number | null
+          updated_at?: string
+          variants?: Json
+          vendor?: string | null
+        }
+        Update: {
+          compare_at_price?: number | null
+          created_at?: string
+          deleted_at?: string | null
+          description?: string | null
+          handle?: string | null
+          id?: string
+          images?: Json
+          max_price?: number | null
+          min_price?: number | null
+          product_type?: string | null
+          raw?: Json
+          shopify_created_at?: string | null
+          shopify_product_id?: string
+          shopify_updated_at?: string | null
+          status?: string | null
+          tags?: string[] | null
+          title?: string | null
+          total_inventory?: number | null
+          updated_at?: string
+          variants?: Json
+          vendor?: string | null
+        }
+        Relationships: []
+      }
+      shopify_webhook_events: {
+        Row: {
+          error: string | null
+          processed_at: string | null
+          received_at: string
+          shop_domain: string | null
+          status: string
+          topic: string
+          webhook_id: string
+        }
+        Insert: {
+          error?: string | null
+          processed_at?: string | null
+          received_at?: string
+          shop_domain?: string | null
+          status?: string
+          topic: string
+          webhook_id: string
+        }
+        Update: {
+          error?: string | null
+          processed_at?: string | null
+          received_at?: string
+          shop_domain?: string | null
+          status?: string
+          topic?: string
+          webhook_id?: string
+        }
+        Relationships: []
+      }
       signup_rewards: {
         Row: {
           code: string
