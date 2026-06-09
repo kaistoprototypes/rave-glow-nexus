@@ -31,6 +31,30 @@ export async function upsertShopifyOrder(payload: any) {
     .from("shopify_orders")
     .upsert(row, { onConflict: "shopify_order_id" });
   if (error) throw new Error(error.message);
+
+  // Normalized line items
+  const items: any[] = Array.isArray(payload.line_items) ? payload.line_items : [];
+  if (items.length) {
+    const rows = items.map((li) => ({
+      shopify_line_item_id: String(li.id),
+      shopify_order_id: String(payload.id),
+      shopify_product_id: li.product_id ? String(li.product_id) : null,
+      shopify_variant_id: li.variant_id ? String(li.variant_id) : null,
+      title: li.title ?? null,
+      variant_title: li.variant_title ?? null,
+      sku: li.sku ?? null,
+      quantity: li.quantity ?? null,
+      price: num(li.price),
+      total_discount: num(li.total_discount),
+      vendor: li.vendor ?? null,
+      fulfillment_status: li.fulfillment_status ?? null,
+      raw: li,
+    }));
+    const { error: liErr } = await supabaseAdmin
+      .from("shopify_order_line_items")
+      .upsert(rows, { onConflict: "shopify_line_item_id" });
+    if (liErr) throw new Error(liErr.message);
+  }
 }
 
 export async function markShopifyOrderCancelled(payload: any) {
@@ -89,6 +113,29 @@ export async function upsertShopifyProduct(payload: any) {
     .from("shopify_products")
     .upsert(row, { onConflict: "shopify_product_id" });
   if (error) throw new Error(error.message);
+
+  // Normalized variants
+  if (variants.length) {
+    const rows = variants.map((v: any) => ({
+      shopify_variant_id: String(v.id),
+      shopify_product_id: String(payload.id),
+      title: v.title ?? null,
+      sku: v.sku ?? null,
+      option1: v.option1 ?? null,
+      option2: v.option2 ?? null,
+      option3: v.option3 ?? null,
+      price: num(v.price),
+      compare_at_price: num(v.compare_at_price),
+      inventory_quantity: v.inventory_quantity ?? null,
+      available: v.available ?? (v.inventory_quantity != null ? v.inventory_quantity > 0 : null),
+      position: v.position ?? null,
+      raw: v,
+    }));
+    const { error: vErr } = await supabaseAdmin
+      .from("shopify_product_variants")
+      .upsert(rows, { onConflict: "shopify_variant_id" });
+    if (vErr) throw new Error(vErr.message);
+  }
 }
 
 export async function softDeleteShopifyProduct(payload: any) {
