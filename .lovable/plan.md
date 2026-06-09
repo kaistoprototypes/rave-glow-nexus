@@ -1,47 +1,67 @@
-# Promotions, Holiday Calendar & Signup Discounts
+# Shopify + Yoycol Integration Plan
 
-## 1. Database (new tables)
+## Architecture
+```
+Yoycol catalog ──(create only)──▶ Shopify  ◀──(edit images/desc/price)── Your Admin Panel
+                                     │
+                                     ▼
+                              Storefront API (read)
+                                     │
+                                     ▼
+                              Your Lovable Site (cart)
+                                     │
+                                     ▼  checkout
+                              Shopify Checkout
+                                     │
+                                  paid order
+                                     │
+                              orders/create webhook
+                                     ▼
+                            /api/public/shopify-order
+                                     │
+                            Create Yoycol fulfillment order
+```
 
-**`promotions`** — holiday specials with a date range
-- `name`, `kind` (`buy_3_get_1_free` always-on | `buy_2_get_1_free` | `buy_1_get_half_off` | `flat_off`), `flat_amount` (nullable, for $5–$10 off), `starts_at`, `ends_at`, `enabled`, `priority`
-- Admin manage; public read of active rows only.
+Shopify is the single source of truth. Yoycol creates products; manual edits in your admin update Shopify directly via Admin API and are live instantly.
 
-**`signup_rewards`** — 20% off first product coupon, auto-issued on signup
-- `user_id`, `code` (unique), `percent_off`, `used_at`, `expires_at`
-- Trigger on `auth.users` insert → create a row + insert a personal coupon code into the existing `coupons` table scoped to that user (or store directly in `signup_rewards` and check it at checkout).
+## What I'll build
 
-**Permanent rule** (no DB row needed): Buy 3 Get 1 Free, cheapest free, capped at $45 — lives in code as the baseline promo.
+### 1. Storefront (read products from Shopify)
+- `src/lib/shopify.ts` — Storefront API client (token, domain, GraphQL helper), 2025-07.
+- `src/stores/cartStore.ts` — Zustand cart with Shopify cart create/update/remove + checkoutUrl.
+- `src/hooks/useCartSync.ts` — clears local cart after checkout completion.
+- `src/components/CartDrawer.tsx` — cart UI with "Checkout with Shopify" (opens checkoutUrl in new tab, `channel=online_store`).
+- `src/components/ShopifyProductGrid.tsx` + product detail route `src/routes/product/$handle.tsx`.
+- Mount `useCartSync` in `__root.tsx`.
 
-## 2. Promo engine (`src/lib/promotions.ts`)
-Pure function `computeDiscount(items, activePromo, isAuthenticated)` returning `{ discount, label, requiresAuth }`:
-- Always evaluate **Buy 3 Get 1 Free** (cheapest item per group of 3, free amount capped at $45 total).
-- If a holiday promo is active, evaluate it and pick whichever yields higher discount.
-- If `!isAuthenticated`, return `requiresAuth: true` with the would-be discount shown but not applied.
+### 2. Admin edits → Shopify (server-side)
+- `src/lib/shopify-admin.functions.ts` — `createServerFn` wrappers (admin-only via `has_role`) for:
+  - `updateShopifyProduct({ productId, title?, description?, price?, images? })`
+  - Uses Shopify Admin GraphQL via stored admin token (already configured by the integration).
+- Hook into existing admin Products screen: edits call this fn → Shopify → live.
 
-## 3. Cart updates
-- Show discount line + "Sign in to unlock $X off" CTA when unauthenticated.
-- Apply 20% first-product coupon automatically post-login if user has unused `signup_rewards` row.
-- Cart already persists via zustand+localStorage; on auth state change merge local cart into a new `user_carts` table (jsonb) so it follows the user across devices.
+### 3. Yoycol → Shopify (create only)
+- Update existing `src/routes/api/public/yoycol-sync.ts` to:
+  - Create new Shopify products via `shopify--create_product` Admin API.
+  - Store mapping in `yoycol_product_mappings`.
+  - Skip update if a mapping already exists (preserves manual edits).
 
-## 4. Admin: Promotions Calendar
-New tab in `/admin` "Promotions":
-- Calendar (shadcn `Calendar`) highlighting days with active promos.
-- List + form to create/edit/delete promos: name, kind dropdown, flat amount (if `flat_off`), date range picker, enabled toggle.
-- Server fns: `listPromotions`, `upsertPromotion`, `deletePromotion` in `src/lib/admin.functions.ts` (admin-gated).
+### 4. Shopify orders → Yoycol fulfillment
+- New route `src/routes/api/public/shopify-order.ts` (HMAC-verified Shopify webhook).
+- On `orders/paid`:
+  - Look up Yoycol product IDs via `yoycol_product_mappings`.
+  - Call Yoycol order-create API with shipping address + line items.
+  - Persist into `yoycol_orders`.
+- Add `SHOPIFY_WEBHOOK_SECRET` to project secrets.
+- Webhook registration URL provided so you can paste into Shopify Admin → Notifications → Webhooks (`orders/paid` event).
 
-## 5. Homepage banner
-Top-of-page dismissible banner: **"Sign up & get 20% off your first product"** → links to `/login?signup=1`. Hidden for authenticated users.
+## Technical notes
+- Storefront token + shop domain fetched from Shopify integration tools and written into `src/lib/shopify.ts` as constants (storefront token is publishable).
+- Admin operations go through `createServerFn` so the Admin token never reaches the browser.
+- Yoycol mapping table already exists (`yoycol_product_mappings`); no schema change.
+- One secret needed: `SHOPIFY_WEBHOOK_SECRET` (you copy it from the Shopify webhook config screen after I give you the URL).
 
-## 6. Checkout gate
-At checkout, if discount applied and user not authed → redirect to `/login?redirect=/checkout` with toast "Sign in to claim your discount".
-
-## Files
-- migration: `promotions`, `signup_rewards`, `user_carts` + signup trigger
-- new: `src/lib/promotions.ts`, `src/lib/promotions.functions.ts`, `src/components/PromoBanner.tsx`, `src/components/admin/PromotionsPanel.tsx`
-- edit: `src/routes/admin.tsx` (add tab), `src/routes/cart.tsx` (discount UI + auth gate), `src/routes/checkout.tsx` (apply discount), `src/routes/index.tsx` (banner), `src/lib/cart-store.ts` (sync hook), `src/lib/admin.functions.ts`
-
-## Technical notes (non-technical readers can skip)
-- Promo selection: highest-discount-wins to keep UX simple.
-- Buy-N-Get-1 implementation: sort cart line items expanded by qty, group into N+1 buckets, free = cheapest in each bucket; sum capped at $45 for the permanent rule, uncapped for holiday `buy_2_get_1_free`.
-- Coupon code stays optional — these promos auto-apply.
-- Cart sync: on `SIGNED_IN`, upsert local items to `user_carts`; on load while authed, merge remote → local (remote wins on conflict by productId+size).
+## Out of scope (call out)
+- Tax/shipping rules: handled by Shopify Checkout, nothing to wire.
+- Inventory sync from Yoycol: print-on-demand has no stock, so we skip.
+- Variant-level Yoycol mapping if products have many variants — flag if needed.
