@@ -28,7 +28,7 @@ function Admin() {
   const nav = useNavigate();
   const qc = useQueryClient();
   const [ready, setReady] = useState(false);
-  const [tab, setTab] = useState<"products"|"orders"|"media"|"tools"|"promotions"|"yoycol"|"notifications">("products");
+  const [tab, setTab] = useState<"products"|"orders"|"media"|"tools"|"promotions"|"yoycol"|"webhooks"|"notifications">("products");
   const [search, setSearch] = useState("");
 
   useEffect(() => {
