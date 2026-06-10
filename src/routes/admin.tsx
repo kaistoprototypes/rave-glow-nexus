@@ -253,6 +253,7 @@ function Admin() {
       {tab === "media" && <MediaManagerPanel />}
       {tab === "promotions" && <PromotionsPanel />}
       {tab === "yoycol" && <YoycolPanel />}
+      {tab === "webhooks" && <ShopifyWebhooksPanel />}
       {tab === "notifications" && <AdminNotificationsPanel />}
     </div>
   );
