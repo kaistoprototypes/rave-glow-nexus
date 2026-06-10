@@ -124,7 +124,7 @@ function Admin() {
           <h1 className="font-display text-4xl md:text-5xl font-black">Control room</h1>
         </div>
         <nav className="flex gap-1 rounded-full glass p-1 flex-wrap">
-          {(["products","orders","media","tools","promotions","yoycol","notifications"] as const).map((t) => (
+          {(["products","orders","media","tools","promotions","yoycol","webhooks","notifications"] as const).map((t) => (
             <button key={t} onClick={()=>setTab(t)} className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest ${tab===t ? "bg-[color:var(--lime)] text-black font-bold" : "text-foreground/70 hover:text-foreground"}`}>{t}</button>
           ))}
         </nav>
