@@ -17,6 +17,7 @@ import { AdminNotificationsPanel } from "@/components/AdminNotificationsPanel";
 import { MediaManagerPanel } from "@/components/MediaManagerPanel";
 import { PromotionsPanel } from "@/components/admin/PromotionsPanel";
 import { YoycolPanel } from "@/components/admin/YoycolPanel";
+import { ShopifyWebhooksPanel } from "@/components/admin/ShopifyWebhooksPanel";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin — Electric Pulse Emporium" }] }),
