@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCart } from "@/lib/cart-store";
 import { Menu, X, Search, ShoppingBag, User, Sparkles } from "lucide-react";
 
@@ -13,8 +13,11 @@ const navLinks = [
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const count = useCart((s) => s.count());
   const openCart = useCart((s) => s.open);
+
+  useEffect(() => setMounted(true), []);
 
   return (
     <header className="sticky top-0 z-40 glass border-b border-border/40">
@@ -51,7 +54,7 @@ export function Navbar() {
             aria-label="Cart"
           >
             <ShoppingBag className="h-5 w-5" />
-            {count > 0 && (
+            {mounted && count > 0 && (
               <span className="absolute -right-1 -top-1 grid h-5 min-w-[20px] place-items-center rounded-full bg-[color:var(--magenta)] px-1 text-[10px] font-bold text-white ring-glow-magenta">
                 {count}
               </span>
