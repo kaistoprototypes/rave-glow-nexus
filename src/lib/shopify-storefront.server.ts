@@ -130,6 +130,8 @@ export function inferGender(title?: string, productType?: string, flatTags: stri
   if (/\b(unisex)\b/.test(hay)) return "unisex";
   if (/\b(hat|cap|beanie|bag|tote|sock|accessor|jewel|sticker|patch|pin)\b/.test(hay)) return "accessories";
   return "";
+}
+
 
 export function mapShopifyProduct(node: any): MappedProduct {
   const tags: string[] = node.tags ?? [];
