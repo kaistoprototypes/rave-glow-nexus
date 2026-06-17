@@ -88,15 +88,16 @@ function ProductPage() {
       </div>
       <div className="grid gap-10 md:grid-cols-2">
         <div className="space-y-4">
-          <div className="aspect-square card-glow rounded-2xl overflow-hidden">
+          <div className="aspect-square card-glow rounded-2xl overflow-hidden bg-white">
             {active.kind === "video" ? (
-              <video src={active.url} controls autoPlay muted loop playsInline className="h-full w-full object-cover" />
+              <video src={active.url} controls autoPlay muted loop playsInline className="h-full w-full object-contain" />
             ) : active.kind === "image" ? (
-              <img src={active.url} alt={p.name} className="h-full w-full object-cover" />
+              <img src={active.url} alt={p.name} className="h-full w-full object-contain" />
             ) : (
               <ProductArt palette={p.color_palette} name={p.name} style={p.design_style ?? ""} className="h-full w-full" />
             )}
           </div>
+
           <div className="grid grid-cols-4 gap-3">
             {videoUrl && (
               <button
@@ -113,10 +114,11 @@ function ProductPage() {
                 key={url + i}
                 onClick={() => setActive({ kind: "image", url })}
                 aria-label={`View image ${i + 1}`}
-                className={`aspect-square rounded-xl overflow-hidden border transition ${active.kind === "image" && active.url === url ? "border-[color:var(--lime)] ring-2 ring-[color:var(--lime)]/50" : "border-border/40 hover:border-[color:var(--cyan)]"}`}
+                className={`aspect-square rounded-xl overflow-hidden border bg-white transition ${active.kind === "image" && active.url === url ? "border-[color:var(--lime)] ring-2 ring-[color:var(--lime)]/50" : "border-border/40 hover:border-[color:var(--cyan)]"}`}
               >
-                <img src={url} alt="" className="h-full w-full object-cover" />
+                <img src={url} alt="" className="h-full w-full object-contain" />
               </button>
+
             )) : !videoUrl && [0,1,2,3].map((i) => (
               <button
                 key={i}

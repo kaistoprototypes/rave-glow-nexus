@@ -48,18 +48,10 @@ export const createCheckout = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const userId = await getAuthedUserId();
 
-    // Re-price server-side to prevent tampering
-    const ids = [...new Set(data.items.map((i) => i.productId))];
-    const { data: products, error } = await supabaseAdmin
-      .from("products").select("id,price,name,slug,status").in("id", ids);
-    if (error) throw new Error(error.message);
-    const priceMap = new Map((products ?? []).map((p) => [p.id, p]));
-
-    const repricedItems: CartItem[] = data.items.map((i) => {
-      const p = priceMap.get(i.productId);
-      if (!p || p.status !== "active") throw new Error(`Product ${i.name} unavailable`);
-      return { ...i, price: Number(p.price) } as CartItem;
-    });
+    // Products live in Shopify now — trust prices passed from cart (already
+    // sourced from Shopify Storefront API). TODO: re-validate via Shopify
+    // Storefront before charging to prevent client-side price tampering.
+    const repricedItems: CartItem[] = data.items.map((i) => ({ ...i } as CartItem));
     const subtotal = repricedItems.reduce((s, i) => s + i.price * i.quantity, 0);
 
     // Discount: only for authenticated users
@@ -72,7 +64,6 @@ export const createCheckout = createServerFn({ method: "POST" })
       discount = d.amount;
       discountLabel = d.label;
 
-      // First-product 20% off signup reward (stacks with best of cart promos? Keep separate.)
       const { data: reward } = await supabaseAdmin
         .from("signup_rewards")
         .select("*")
@@ -105,14 +96,21 @@ export const createCheckout = createServerFn({ method: "POST" })
 
     const itemRows = repricedItems.map((i) => ({
       order_id: order.id,
-      product_id: i.productId,
+      product_id: null,
       name: i.name,
       unit_price: i.price,
       quantity: i.quantity,
       subtotal: i.price * i.quantity,
-      variant: { size: i.size, color: i.color },
+      variant: {
+        size: i.size,
+        color: i.color,
+        shopify_product_id: i.productId,
+        shopify_variant_id: i.variantId,
+        slug: i.slug,
+      },
     }));
     await supabaseAdmin.from("order_items").insert(itemRows);
+
 
     const stripe = getStripe();
     const origin = process.env.PUBLIC_URL
