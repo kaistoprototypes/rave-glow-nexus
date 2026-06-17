@@ -63,8 +63,10 @@ export const createCheckout = createServerFn({ method: "POST" })
 
 // Legacy Stripe confirm — kept as no-op so /order/success doesn't crash.
 // Orders are now created via Shopify webhooks (orders/create).
+type ConfirmedOrder = { id: string; email: string; total: number; status: string; created_at: string } | null;
+
 export const confirmCheckout = createServerFn({ method: "POST" })
   .inputValidator(z.object({ session_id: z.string().min(1) }))
-  .handler(async () => {
+  .handler(async (): Promise<{ order: ConfirmedOrder }> => {
     return { order: null };
   });
