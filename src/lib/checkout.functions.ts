@@ -8,7 +8,8 @@ import { computeDiscount, findActivePromotion, type Promotion } from "@/lib/prom
 import type { CartItem } from "@/lib/cart-store";
 
 const ItemSchema = z.object({
-  productId: z.string().uuid(),
+  productId: z.string().min(1),
+  variantId: z.string().optional(),
   slug: z.string(),
   name: z.string(),
   price: z.number().min(0).max(10000),
@@ -16,6 +17,7 @@ const ItemSchema = z.object({
   size: z.string().optional(),
   color: z.string().optional(),
   image_palette: z.array(z.string()).optional(),
+  image_url: z.string().optional(),
 });
 
 function getStripe() {
