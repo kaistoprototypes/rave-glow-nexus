@@ -63,6 +63,6 @@ export const useCart = create<CartState>()(
       subtotal: () => get().items.reduce((s, i) => s + i.price * i.quantity, 0),
       count: () => get().items.reduce((s, i) => s + i.quantity, 0),
     }),
-    { name: "epe-cart" },
+    { name: "epe-cart", version: 2, migrate: () => ({ items: [], isOpen: false } as any) },
   ),
 );
