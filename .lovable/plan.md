@@ -1,67 +1,62 @@
-# Shopify + Yoycol Integration Plan
+# Live Shopify storefront + on-site checkout
 
-## Architecture
-```
-Yoycol catalog ──(create only)──▶ Shopify  ◀──(edit images/desc/price)── Your Admin Panel
-                                     │
-                                     ▼
-                              Storefront API (read)
-                                     │
-                                     ▼
-                              Your Lovable Site (cart)
-                                     │
-                                     ▼  checkout
-                              Shopify Checkout
-                                     │
-                                  paid order
-                                     │
-                              orders/create webhook
-                                     ▼
-                            /api/public/shopify-order
-                                     │
-                            Create Yoycol fulfillment order
-```
+Goal: products pulled live from your Shopify store, customers buy on your domain with Stripe Elements (no redirect), and paid orders are pushed into Shopify so inventory decrements and your existing Yoycol fulfillment fires.
 
-Shopify is the single source of truth. Yoycol creates products; manual edits in your admin update Shopify directly via Admin API and are live instantly.
+Current state I found while investigating:
+- Local `products` table has **0 rows** → that's why your site shows nothing
+- Shopify store has **1 product** (the one you just created)
+- The existing checkout already uses Stripe **Hosted Checkout** (redirects to stripe.com). I'll convert it to **on-site Stripe Elements** so the customer never leaves your site.
+- Stripe is BYOK today (`STRIPE_SECRET_KEY` already configured). No new secret needed.
 
-## What I'll build
+## Decisions (locked in)
+- Storefront source of truth: **Shopify** (live, via Storefront API)
+- Checkout: **on-site** using Stripe Payment Element
+- Shipping: **flat $5.99**, free over $80 (stored in `site_settings` so you can change it later)
+- Guests + signed-in users both supported
+- After successful Stripe payment, server pushes order into Shopify Admin API with `financial_status: paid` → Shopify decrements inventory → your `orders-create` webhook fires → Yoycol fulfillment runs (already wired)
 
-### 1. Storefront (read products from Shopify)
-- `src/lib/shopify.ts` — Storefront API client (token, domain, GraphQL helper), 2025-07.
-- `src/stores/cartStore.ts` — Zustand cart with Shopify cart create/update/remove + checkoutUrl.
-- `src/hooks/useCartSync.ts` — clears local cart after checkout completion.
-- `src/components/CartDrawer.tsx` — cart UI with "Checkout with Shopify" (opens checkoutUrl in new tab, `channel=online_store`).
-- `src/components/ShopifyProductGrid.tsx` + product detail route `src/routes/product/$handle.tsx`.
-- Mount `useCartSync` in `__root.tsx`.
+## Build phases
 
-### 2. Admin edits → Shopify (server-side)
-- `src/lib/shopify-admin.functions.ts` — `createServerFn` wrappers (admin-only via `has_role`) for:
-  - `updateShopifyProduct({ productId, title?, description?, price?, images? })`
-  - Uses Shopify Admin GraphQL via stored admin token (already configured by the integration).
-- Hook into existing admin Products screen: edits call this fn → Shopify → live.
+### Phase 1 — Live Shopify storefront (the fix for "nothing showing")
+1. New `src/lib/shopify-storefront.server.ts` — Storefront GraphQL client (uses existing `SHOPIFY_STOREFRONT_ACCESS_TOKEN`).
+2. New `src/lib/shopify-products.functions.ts` — server fns: `listShopifyProducts`, `getShopifyProductByHandle`, `getShopifyHomeData`. Maps Shopify response → existing `ProductCardData` shape so the UI doesn't have to change much.
+3. Rewrite `src/routes/index.tsx`, `src/routes/shop.tsx`, `src/routes/products.$slug.tsx` to call the new fns. Product slug becomes Shopify `handle`.
+4. Add **inventory badges** to `ProductCard` ("Sold out" / "Only N left" / nothing if plenty). Disable Add-to-Cart when sold out.
+5. Filters (gender, style, type) reused via Shopify product tags. I'll show you how to tag products in Shopify.
 
-### 3. Yoycol → Shopify (create only)
-- Update existing `src/routes/api/public/yoycol-sync.ts` to:
-  - Create new Shopify products via `shopify--create_product` Admin API.
-  - Store mapping in `yoycol_product_mappings`.
-  - Skip update if a mapping already exists (preserves manual edits).
+### Phase 2 — On-site checkout with Stripe Elements
+6. Install `@stripe/stripe-js` + `@stripe/react-stripe-js`.
+7. New `src/routes/checkout.tsx` — single page with: email, shipping address, Payment Element. No redirect.
+8. New `src/lib/checkout.functions.ts` → add `createPaymentIntent` server fn (validates cart against Shopify live prices + inventory, creates Stripe PaymentIntent, returns client_secret).
+9. After payment confirms client-side, call new `finalizeOrder` server fn which:
+   - Verifies PaymentIntent succeeded
+   - Calls Shopify Admin API `POST /orders.json` with `financial_status: paid`, line items (with variant IDs), shipping address, customer email
+   - Persists local copy in `orders` + `order_items`
+   - Returns order confirmation
+10. New `src/routes/api/public/stripe/webhook.ts` — `payment_intent.succeeded` as backup source of truth (handles browser-close-after-payment case).
 
-### 4. Shopify orders → Yoycol fulfillment
-- New route `src/routes/api/public/shopify-order.ts` (HMAC-verified Shopify webhook).
-- On `orders/paid`:
-  - Look up Yoycol product IDs via `yoycol_product_mappings`.
-  - Call Yoycol order-create API with shipping address + line items.
-  - Persist into `yoycol_orders`.
-- Add `SHOPIFY_WEBHOOK_SECRET` to project secrets.
-- Webhook registration URL provided so you can paste into Shopify Admin → Notifications → Webhooks (`orders/paid` event).
+### Phase 3 — Cleanup
+11. Update cart store to use Shopify variant IDs (needed for Shopify order creation).
+12. Remove now-unused `listProducts` / `getProductBySlug` / `getHomeData` from local-products path (keep table for admin overlays like featured/best-seller flags, but storefront no longer queries it).
 
-## Technical notes
-- Storefront token + shop domain fetched from Shopify integration tools and written into `src/lib/shopify.ts` as constants (storefront token is publishable).
-- Admin operations go through `createServerFn` so the Admin token never reaches the browser.
-- Yoycol mapping table already exists (`yoycol_product_mappings`); no schema change.
-- One secret needed: `SHOPIFY_WEBHOOK_SECRET` (you copy it from the Shopify webhook config screen after I give you the URL).
+## Files I'll create or change
+**New (~7):**
+- `src/lib/shopify-storefront.server.ts`
+- `src/lib/shopify-products.functions.ts`
+- `src/lib/shopify-admin.server.ts` (Admin API client for order push)
+- `src/routes/checkout.tsx`
+- `src/routes/api/public/stripe/webhook.ts`
+- migration: `site_settings` seed for shipping config
 
-## Out of scope (call out)
-- Tax/shipping rules: handled by Shopify Checkout, nothing to wire.
-- Inventory sync from Yoycol: print-on-demand has no stock, so we skip.
-- Variant-level Yoycol mapping if products have many variants — flag if needed.
+**Modified (~8):**
+- `src/routes/index.tsx`, `src/routes/shop.tsx`, `src/routes/products.$slug.tsx`
+- `src/components/ProductCard.tsx` (inventory badges, variant ID)
+- `src/lib/cart-store.ts` (carry variant ID)
+- `src/routes/cart.tsx` (link to /checkout, not Hosted Checkout)
+- `src/lib/checkout.functions.ts` (rewrite for Elements + Shopify push)
+
+## Open questions before I start
+1. **Filters.** Your current filters use `gender`, `product_type`, `design_style`. Shopify's standard taxonomy doesn't have these. I'll filter by **product tags** — you'd tag products in Shopify like `gender:men`, `style:cosmic-carnival`, `type:hoodie`. Cool with that approach, or drop filters entirely until you've added more products?
+2. **Test order.** Should I include a Stripe test-mode card flow so you can place a real end-to-end test order (storefront → checkout → Shopify order created → Yoycol triggered) after Phase 2 ships?
+
+This is a ~3-message build. Phase 1 first (gets your site populated). Then Phase 2 in a follow-up message. Approve and I'll start with Phase 1.
