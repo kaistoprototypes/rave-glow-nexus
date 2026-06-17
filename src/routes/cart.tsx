@@ -103,7 +103,7 @@ function Cart() {
               }}
               className="btn-neon w-full rounded-full py-3 text-sm"
             >
-              {!isAuthed && discount.amount > 0 ? "Sign in to checkout" : "Checkout"}
+              {!isAuthed && discount.amount > 0 ? "Sign in to checkout" : "Proceed to Checkout"}
             </button>
           </aside>
         </div>
