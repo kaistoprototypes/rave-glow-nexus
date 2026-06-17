@@ -13,7 +13,7 @@ export async function verifyAndParseShopifyWebhook(
   request: Request,
   expectedTopic: string,
 ): Promise<{ ok: true; ctx: ShopifyWebhookContext } | { ok: false; response: Response }> {
-  const secret = process.env.SHOPIFY_WEBHOOK_SECRET;
+  const secret = process.env.SHOPIFY_WEBHOOK_SIGN ?? process.env.SHOPIFY_WEBHOOK_SECRET;
   if (!secret) {
     return { ok: false, response: new Response("Webhook secret not configured", { status: 500 }) };
   }
