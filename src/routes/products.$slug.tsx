@@ -8,6 +8,7 @@ import { useCart } from "@/lib/cart-store";
 import { money } from "@/lib/format";
 import { Heart, Truck, Shield, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { AdminEditProductButton } from "@/components/AdminEditProductButton";
 
 export const Route = createFileRoute("/products/$slug")({
   component: ProductPage,
@@ -199,6 +200,7 @@ function ProductPage() {
           </div>
         </section>
       )}
+      <AdminEditProductButton handle={p.slug} />
     </div>
   );
 }
