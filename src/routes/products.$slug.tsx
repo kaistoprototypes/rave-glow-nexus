@@ -169,10 +169,17 @@ function ProductPage() {
             <Stat icon={<Sparkles className="h-4 w-4 text-[color:var(--magenta)]" />} t="Original art" />
           </div>
 
-          {p.long_description && (
+          {(p.description_html || p.long_description) && (
             <div className="pt-6 border-t border-border/40">
               <h3 className="font-display text-lg font-bold uppercase tracking-widest text-[color:var(--lime)] mb-2">The drop</h3>
-              <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-line">{p.long_description}</p>
+              {p.description_html ? (
+                <div
+                  className="prose prose-invert prose-sm max-w-none text-sm leading-relaxed text-muted-foreground [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:text-[color:var(--cyan)] [&_strong]:text-foreground [&_h1]:text-foreground [&_h2]:text-foreground [&_h3]:text-foreground [&_table]:w-full [&_th]:text-left [&_td]:py-1 [&_img]:rounded-lg"
+                  dangerouslySetInnerHTML={{ __html: p.description_html }}
+                />
+              ) : (
+                <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-line">{p.long_description}</p>
+              )}
             </div>
           )}
           {p.design_story && (
