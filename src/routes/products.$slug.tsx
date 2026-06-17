@@ -83,12 +83,12 @@ function ProductPage() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10">
-      <div className="mb-6 text-xs text-muted-foreground uppercase tracking-widest">
+    <div className="mx-auto max-w-7xl px-4 py-10 overflow-x-hidden">
+      <div className="mb-6 text-xs text-muted-foreground uppercase tracking-widest break-words">
         <Link to="/" className="hover:text-[color:var(--cyan)]">Home</Link> / <Link to="/shop" className="hover:text-[color:var(--cyan)]">Shop</Link> / {p.name}
       </div>
       <div className="grid gap-10 md:grid-cols-2">
-        <div className="space-y-4">
+        <div className="space-y-4 min-w-0">
           <div className="aspect-square card-glow rounded-2xl overflow-hidden bg-white">
             {active.kind === "video" ? (
               <video src={active.url} controls autoPlay muted loop playsInline className="h-full w-full object-contain" />
@@ -99,12 +99,12 @@ function ProductPage() {
             )}
           </div>
 
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-4 gap-2 sm:gap-3 min-w-0">
             {videoUrl && (
               <button
                 onClick={() => setActive({ kind: "video", url: videoUrl })}
                 aria-label="Play hero video"
-                className={`relative aspect-square rounded-xl overflow-hidden border transition ${active.kind === "video" ? "border-[color:var(--lime)] ring-2 ring-[color:var(--lime)]/50" : "border-border/40 hover:border-[color:var(--cyan)]"}`}
+                className={`relative aspect-square rounded-xl overflow-hidden border transition min-w-0 ${active.kind === "video" ? "border-[color:var(--lime)] ring-2 ring-[color:var(--lime)]/50" : "border-border/40 hover:border-[color:var(--cyan)]"}`}
               >
                 <video src={videoUrl} muted className="h-full w-full object-cover" />
                 <span className="absolute inset-0 grid place-items-center bg-black/40 text-white text-[10px] font-bold uppercase">▶ Video</span>
@@ -115,7 +115,7 @@ function ProductPage() {
                 key={url + i}
                 onClick={() => setActive({ kind: "image", url })}
                 aria-label={`View image ${i + 1}`}
-                className={`aspect-square rounded-xl overflow-hidden border bg-white transition ${active.kind === "image" && active.url === url ? "border-[color:var(--lime)] ring-2 ring-[color:var(--lime)]/50" : "border-border/40 hover:border-[color:var(--cyan)]"}`}
+                className={`aspect-square rounded-xl overflow-hidden border bg-white transition min-w-0 ${active.kind === "image" && active.url === url ? "border-[color:var(--lime)] ring-2 ring-[color:var(--lime)]/50" : "border-border/40 hover:border-[color:var(--cyan)]"}`}
               >
                 <img src={url} alt="" className="h-full w-full object-contain" />
               </button>
@@ -124,7 +124,7 @@ function ProductPage() {
               <button
                 key={i}
                 onClick={() => setActive({ kind: "art" })}
-                className={`aspect-square rounded-xl overflow-hidden border ${active.kind === "art" ? "border-[color:var(--lime)] ring-2 ring-[color:var(--lime)]/50" : "border-border/40"}`}
+                className={`aspect-square rounded-xl overflow-hidden border min-w-0 ${active.kind === "art" ? "border-[color:var(--lime)] ring-2 ring-[color:var(--lime)]/50" : "border-border/40"}`}
               >
                 <ProductArt palette={[...p.color_palette].reverse()} name={p.name + i} style={p.design_style ?? ""} className="h-full w-full" />
               </button>
@@ -132,14 +132,14 @@ function ProductPage() {
           </div>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-6 min-w-0">
           <div className="flex flex-wrap gap-2">
             {p.is_new_drop && <span className="rounded-full bg-[color:var(--lime)] px-3 py-1 text-[10px] font-bold uppercase text-black">New drop</span>}
             {p.is_best_seller && <span className="rounded-full bg-[color:var(--magenta)] px-3 py-1 text-[10px] font-bold uppercase text-white">Best seller</span>}
             {p.design_style && <span className="rounded-full glass px-3 py-1 text-[10px] font-bold uppercase">{p.design_style}</span>}
           </div>
-          <h1 className="font-display text-4xl md:text-5xl font-black">{p.name}</h1>
-          <p className="text-muted-foreground">{p.short_description}</p>
+          <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-black break-words">{p.name}</h1>
+          <p className="text-muted-foreground break-words">{p.short_description}</p>
           <div className="flex items-baseline gap-3 flex-wrap">
             <span className="text-3xl font-bold text-[color:var(--lime)] glow-lime">{money(price)}</span>
             {compare && <span className="text-lg line-through text-muted-foreground">{money(compare)}</span>}
@@ -160,8 +160,8 @@ function ProductPage() {
           )}
 
           <div className="flex gap-3">
-            <button onClick={() => { handleAdd(); open(); }} className="btn-neon flex-1 rounded-full py-3.5 text-sm">Add to bag — {money(price)}</button>
-            <button className="btn-outline-neon grid h-12 w-12 place-items-center rounded-full"><Heart className="h-4 w-4" /></button>
+            <button onClick={() => { handleAdd(); open(); }} className="btn-neon flex-1 rounded-full py-3.5 text-sm min-w-0 truncate">Add to bag — {money(price)}</button>
+            <button className="btn-outline-neon grid h-12 w-12 shrink-0 place-items-center rounded-full"><Heart className="h-4 w-4" /></button>
           </div>
 
           <div className="grid grid-cols-3 gap-3 pt-4">
@@ -169,28 +169,32 @@ function ProductPage() {
             <Stat icon={<Shield className="h-4 w-4 text-[color:var(--lime)]" />} t="30-day returns" />
             <Stat icon={<Sparkles className="h-4 w-4 text-[color:var(--magenta)]" />} t="Original art" />
           </div>
+        </div>
+      </div>
 
+      {(p.description_html || p.long_description || p.design_story) && (
+        <section className="mt-12 pt-8 border-t border-border/40 space-y-10">
           {(p.description_html || p.long_description) && (
-            <div className="pt-6 border-t border-border/40">
-              <h3 className="font-display text-lg font-bold uppercase tracking-widest text-[color:var(--lime)] mb-2">The drop</h3>
+            <div>
+              <h3 className="font-display text-lg font-bold uppercase tracking-widest text-[color:var(--lime)] mb-4">The drop</h3>
               {p.description_html ? (
                 <div
-                  className="prose prose-invert prose-sm max-w-none text-sm leading-relaxed text-muted-foreground [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:text-[color:var(--cyan)] [&_strong]:text-foreground [&_h1]:text-foreground [&_h2]:text-foreground [&_h3]:text-foreground [&_table]:w-full [&_th]:text-left [&_td]:py-1 [&_img]:rounded-lg"
+                  className="prose prose-invert prose-sm max-w-none text-sm leading-relaxed text-muted-foreground md:columns-2 md:gap-10 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:text-[color:var(--cyan)] [&_strong]:text-foreground [&_h1]:text-foreground [&_h2]:text-foreground [&_h3]:text-foreground [&_table]:w-full [&_th]:text-left [&_td]:py-1 [&_img]:rounded-lg [&>*]:break-inside-avoid"
                   dangerouslySetInnerHTML={{ __html: p.description_html }}
                 />
               ) : (
-                <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-line">{p.long_description}</p>
+                <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-line md:columns-2 md:gap-10">{p.long_description}</p>
               )}
             </div>
           )}
           {p.design_story && (
-            <div className="pt-6 border-t border-border/40">
-              <h3 className="font-display text-lg font-bold uppercase tracking-widest text-[color:var(--magenta)] mb-2">Design story</h3>
-              <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-line">{p.design_story}</p>
+            <div>
+              <h3 className="font-display text-lg font-bold uppercase tracking-widest text-[color:var(--magenta)] mb-4">Design story</h3>
+              <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-line md:columns-2 md:gap-10">{p.design_story}</p>
             </div>
           )}
-        </div>
-      </div>
+        </section>
+      )}
 
       {data.related.length > 0 && (
         <section className="mt-24">
