@@ -16,7 +16,8 @@ function buildQueryString(filters: {
   new_drop?: boolean;
 }): string {
   const parts: string[] = [];
-  if (filters.gender) parts.push(`tag:'gender:${filters.gender}'`);
+  // gender intentionally omitted — many stores don't tag products with gender:*,
+  // so we infer it from title/product_type and filter after fetch.
   if (filters.design_style) parts.push(`tag:'style:${filters.design_style}'`);
   if (filters.product_type) parts.push(`(product_type:'${filters.product_type}' OR tag:'type:${filters.product_type}')`);
   if (filters.best_seller) parts.push(`(tag:'best-seller' OR tag:'bestseller')`);
