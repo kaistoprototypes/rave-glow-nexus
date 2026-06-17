@@ -2,7 +2,8 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export type CartItem = {
-  productId: string;
+  productId: string;       // shopify product GID
+  variantId?: string;      // shopify variant GID — required for checkout
   slug: string;
   name: string;
   price: number;
@@ -10,6 +11,7 @@ export type CartItem = {
   size?: string;
   color?: string;
   image_palette?: string[];
+  image_url?: string;
 };
 
 type CartState = {

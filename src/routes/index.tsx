@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { getHomeData } from "@/lib/products.functions";
+import { getShopifyHomeData } from "@/lib/shopify-products.functions";
 import { ProductCard } from "@/components/ProductCard";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { PromoBanner } from "@/components/PromoBanner";
@@ -10,7 +10,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Electric Pulse Emporium — Neon Festival Ravewear & After-Dark Streetwear" },
-      { name: "description", content: "90 original neon ravewear designs. Cosmic carnival prints, desert lights graphics, bass night essentials. Shop now." },
+      { name: "description", content: "Original neon ravewear designs. Cosmic carnival prints, desert lights graphics, bass night essentials. Shop now." },
       { property: "og:title", content: "Electric Pulse Emporium — Neon Festival Ravewear" },
       { property: "og:description", content: "Original neon ravewear designed for the floor. Men, women, and accessories." },
     ],
@@ -20,8 +20,8 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const { data, isLoading } = useQuery({
-    queryKey: ["home"],
-    queryFn: () => getHomeData(),
+    queryKey: ["shopify-home"],
+    queryFn: () => getShopifyHomeData(),
   });
 
   return (

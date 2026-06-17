@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
-import { listProducts, getFilterOptions } from "@/lib/products.functions";
+import { listShopifyProducts, getShopifyFilterOptions } from "@/lib/shopify-products.functions";
 import { ProductCard } from "@/components/ProductCard";
 import { Search } from "lucide-react";
 
@@ -21,7 +21,7 @@ export const Route = createFileRoute("/shop")({
   head: () => ({
     meta: [
       { title: "Shop all drops — Electric Pulse Emporium" },
-      { name: "description", content: "Browse 90 original neon ravewear designs. Filter by category, style, and color." },
+      { name: "description", content: "Browse original neon ravewear designs. Filter by category, style, and color." },
     ],
   }),
   component: Shop,
@@ -31,10 +31,10 @@ function Shop() {
   const sp = Route.useSearch();
   const nav = useNavigate({ from: "/shop" });
 
-  const { data: opts } = useQuery({ queryKey: ["filter-opts"], queryFn: () => getFilterOptions() });
+  const { data: opts } = useQuery({ queryKey: ["shopify-filter-opts"], queryFn: () => getShopifyFilterOptions() });
   const { data, isLoading } = useQuery({
-    queryKey: ["shop", sp],
-    queryFn: () => listProducts({ data: {
+    queryKey: ["shopify-shop", sp],
+    queryFn: () => listShopifyProducts({ data: {
       gender: sp.gender,
       product_type: sp.product_type,
       design_style: sp.design_style,
