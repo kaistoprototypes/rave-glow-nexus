@@ -41,7 +41,7 @@ function Checkout() {
           image_palette: i.image_palette,
         })),
       }});
-      if (res.url) window.location.href = res.url;
+      if (res.url) { window.open(res.url, "_blank", "noopener,noreferrer"); setLoading(false); }
       else { toast.error("Could not start checkout"); setLoading(false); }
     } catch (err: any) {
       toast.error(err.message ?? "Checkout failed");
