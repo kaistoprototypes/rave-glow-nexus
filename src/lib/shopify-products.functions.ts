@@ -16,7 +16,8 @@ function buildQueryString(filters: {
   new_drop?: boolean;
 }): string {
   const parts: string[] = [];
-  if (filters.gender) parts.push(`tag:'gender:${filters.gender}'`);
+  // gender intentionally omitted — many stores don't tag products with gender:*,
+  // so we infer it from title/product_type and filter after fetch.
   if (filters.design_style) parts.push(`tag:'style:${filters.design_style}'`);
   if (filters.product_type) parts.push(`(product_type:'${filters.product_type}' OR tag:'type:${filters.product_type}')`);
   if (filters.best_seller) parts.push(`(tag:'best-seller' OR tag:'bestseller')`);
@@ -66,6 +67,16 @@ export const listShopifyProducts = createServerFn({ method: "POST" })
 
     let products: MappedProduct[] = res.products.edges.map((e) => mapShopifyProduct(e.node));
     if (data.new_drop) products = products.filter((p) => p.is_new_drop);
+    if (data.gender) {
+      const g = data.gender.toLowerCase();
+      products = products.filter((p) => {
+        const pg = (p.gender ?? "").toLowerCase();
+        if (!pg) return false;
+        if (g === "accessories") return pg === "accessories";
+        // include unisex in both men and women filters
+        return pg === g || pg === "unisex";
+      });
+    }
     return { products };
   });
 

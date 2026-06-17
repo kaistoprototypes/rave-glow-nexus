@@ -123,6 +123,16 @@ function tagsToMap(tags: string[]): Record<string, string[]> {
   return map;
 }
 
+export function inferGender(title?: string, productType?: string, flatTags: string[] = []): string {
+  const hay = `${title ?? ""} ${productType ?? ""} ${flatTags.join(" ")}`.toLowerCase();
+  if (/\b(women|woman|womens|women's|ladies|female)\b/.test(hay)) return "women";
+  if (/\b(men|mens|men's|man|male)\b/.test(hay)) return "men";
+  if (/\b(unisex)\b/.test(hay)) return "unisex";
+  if (/\b(hat|cap|beanie|bag|tote|sock|accessor|jewel|sticker|patch|pin)\b/.test(hay)) return "accessories";
+  return "";
+}
+
+
 export function mapShopifyProduct(node: any): MappedProduct {
   const tags: string[] = node.tags ?? [];
   const tm = tagsToMap(tags);
@@ -173,7 +183,7 @@ export function mapShopifyProduct(node: any): MappedProduct {
     currency: node.priceRange?.minVariantPrice?.currencyCode ?? "USD",
     color_palette: palette.length >= 3 ? palette.slice(0, 3) : DEFAULT_PALETTE,
     design_style: tm["style"]?.[0] ?? null,
-    gender: tm["gender"]?.[0] ?? "",
+    gender: tm["gender"]?.[0] ?? inferGender(node.title, node.productType, flat),
     product_type: node.productType ?? tm["type"]?.[0] ?? "",
     is_new_drop: isNewDrop,
     is_best_seller: flat.includes("best-seller") || flat.includes("bestseller") || tm["badge"]?.includes("best"),
