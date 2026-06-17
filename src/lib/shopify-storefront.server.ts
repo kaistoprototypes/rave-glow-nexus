@@ -173,7 +173,7 @@ export function mapShopifyProduct(node: any): MappedProduct {
     currency: node.priceRange?.minVariantPrice?.currencyCode ?? "USD",
     color_palette: palette.length >= 3 ? palette.slice(0, 3) : DEFAULT_PALETTE,
     design_style: tm["style"]?.[0] ?? null,
-    gender: tm["gender"]?.[0] ?? "",
+    gender: tm["gender"]?.[0] ?? inferGender(node.title, node.productType, flat),
     product_type: node.productType ?? tm["type"]?.[0] ?? "",
     is_new_drop: isNewDrop,
     is_best_seller: flat.includes("best-seller") || flat.includes("bestseller") || tm["badge"]?.includes("best"),
