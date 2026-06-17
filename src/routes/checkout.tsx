@@ -35,6 +35,7 @@ function Checkout() {
     try {
       const res = await checkoutFn({ data: {
         email,
+        returnUrl: window.location.origin + "/order/success",
         items: items.map((i) => ({
           productId: i.productId, variantId: i.variantId, name: i.name, price: i.price,
           quantity: i.quantity, size: i.size, color: i.color, slug: i.slug,
