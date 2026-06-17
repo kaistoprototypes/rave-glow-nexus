@@ -33,7 +33,8 @@ function Checkout() {
         return;
       }
     } catch {
-      // Fall back to same-frame navigation if the preview frame blocks top navigation.
+      toast.info("Checkout is ready — use the secure Shopify checkout button below.");
+      return;
     }
     window.location.assign(url);
   };
