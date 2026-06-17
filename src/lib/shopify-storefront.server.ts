@@ -32,7 +32,6 @@ export const PRODUCT_CARD_FRAGMENT = /* GraphQL */ `
     vendor
     tags
     createdAt
-    totalInventory
     availableForSale
     images(first: 6) { edges { node { url altText } } }
     options { name values }
@@ -48,7 +47,6 @@ export const PRODUCT_CARD_FRAGMENT = /* GraphQL */ `
           id
           title
           availableForSale
-          quantityAvailable
           price { amount currencyCode }
           compareAtPrice { amount currencyCode }
           selectedOptions { name value }
@@ -139,7 +137,7 @@ export function mapShopifyProduct(node: any): MappedProduct {
       price: Number(v.price?.amount ?? 0),
       compareAtPrice: v.compareAtPrice ? Number(v.compareAtPrice.amount) : null,
       available: !!v.availableForSale,
-      quantity: typeof v.quantityAvailable === "number" ? v.quantityAvailable : null,
+      quantity: null,
       options: optMap,
     };
   });
@@ -179,7 +177,7 @@ export function mapShopifyProduct(node: any): MappedProduct {
     sizes,
     colors,
     sold_count: 0,
-    total_inventory: typeof node.totalInventory === "number" ? node.totalInventory : 0,
+    total_inventory: 0,
     available_for_sale: !!node.availableForSale,
     gallery,
     featured_image: gallery[0] ?? null,
