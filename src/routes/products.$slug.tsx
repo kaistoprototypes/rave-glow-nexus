@@ -1,7 +1,7 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { getProductBySlug } from "@/lib/products.functions";
+import { getShopifyProductByHandle } from "@/lib/shopify-products.functions";
 import { ProductArt } from "@/components/ProductArt";
 import { ProductCard } from "@/components/ProductCard";
 import { useCart } from "@/lib/cart-store";
@@ -30,8 +30,8 @@ function ProductPage() {
   const [initedFor, setInitedFor] = useState<string>("");
 
   const { data, isLoading } = useQuery({
-    queryKey: ["product", slug],
-    queryFn: () => getProductBySlug({ data: { slug } }),
+    queryKey: ["shopify-product", slug],
+    queryFn: () => getShopifyProductByHandle({ data: { handle: slug } }),
   });
 
   const p = data?.product;
