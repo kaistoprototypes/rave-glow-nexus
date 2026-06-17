@@ -123,6 +123,14 @@ function tagsToMap(tags: string[]): Record<string, string[]> {
   return map;
 }
 
+export function inferGender(title?: string, productType?: string, flatTags: string[] = []): string {
+  const hay = `${title ?? ""} ${productType ?? ""} ${flatTags.join(" ")}`.toLowerCase();
+  if (/\b(women|woman|womens|women's|ladies|female)\b/.test(hay)) return "women";
+  if (/\b(men|mens|men's|man|male)\b/.test(hay)) return "men";
+  if (/\b(unisex)\b/.test(hay)) return "unisex";
+  if (/\b(hat|cap|beanie|bag|tote|sock|accessor|jewel|sticker|patch|pin)\b/.test(hay)) return "accessories";
+  return "";
+
 export function mapShopifyProduct(node: any): MappedProduct {
   const tags: string[] = node.tags ?? [];
   const tm = tagsToMap(tags);
