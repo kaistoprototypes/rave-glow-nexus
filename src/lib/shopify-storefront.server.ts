@@ -28,6 +28,7 @@ export const PRODUCT_CARD_FRAGMENT = /* GraphQL */ `
     handle
     title
     description
+    descriptionHtml
     productType
     vendor
     tags
@@ -76,6 +77,7 @@ export type MappedProduct = {
   name: string;
   short_description: string;
   long_description: string;
+  description_html: string;
   design_story: string | null;
   price: number;
   compare_at_price: number | null;
@@ -164,6 +166,7 @@ export function mapShopifyProduct(node: any): MappedProduct {
     name: node.title,
     short_description: (node.description ?? "").split("\n")[0]?.slice(0, 240) ?? "",
     long_description: node.description ?? "",
+    description_html: node.descriptionHtml ?? "",
     design_story: tm["story"]?.[0] ?? null,
     price,
     compare_at_price: compareAt && compareAt > price ? compareAt : null,
