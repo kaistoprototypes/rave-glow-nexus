@@ -64,10 +64,19 @@ function ProductPage() {
 
   const handleAdd = () => {
     if (sizes.length && !size) { toast.error("Pick a size"); return; }
+    const chosenSize = size ?? sizes[0];
+    const variant = (p.variants ?? []).find((v: any) => !chosenSize || v.options?.Size === chosenSize) ?? p.variants?.[0];
+    if (variant && variant.available === false) { toast.error("That option is sold out"); return; }
     add({
-      productId: p.id, slug: p.slug, name: p.name, price, quantity: 1,
-      size: size ?? sizes[0],
+      productId: p.id,
+      variantId: variant?.id,
+      slug: p.slug,
+      name: p.name,
+      price,
+      quantity: 1,
+      size: chosenSize,
       image_palette: p.color_palette,
+      image_url: p.featured_image ?? undefined,
     });
     toast.success(`${p.name} added`);
   };
