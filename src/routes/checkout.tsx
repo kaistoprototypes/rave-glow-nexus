@@ -35,6 +35,7 @@ function Checkout() {
     try {
       const res = await checkoutFn({ data: {
         email,
+        returnUrl: window.location.origin + "/order/success",
         items: items.map((i) => ({
           productId: i.productId, variantId: i.variantId, name: i.name, price: i.price,
           quantity: i.quantity, size: i.size, color: i.color, slug: i.slug,
@@ -69,8 +70,8 @@ function Checkout() {
           </div>
           <p className="text-xs text-muted-foreground">Payment, shipping address, and any local taxes are handled securely on the next step via Stripe.</p>
           <button type="submit" disabled={loading} className="btn-neon w-full rounded-full py-3.5 text-sm flex items-center justify-center gap-2 disabled:opacity-60">
-            {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-            Continue to payment — {money(total)}
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+            {loading ? "Preparing checkout…" : `Proceed to Checkout — ${money(total)}`}
           </button>
           <p className="text-[10px] text-center text-muted-foreground uppercase tracking-widest">Secured by Stripe</p>
         </form>

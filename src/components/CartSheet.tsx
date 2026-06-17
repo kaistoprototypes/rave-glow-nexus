@@ -60,7 +60,7 @@ export function CartSheet() {
             onClick={() => { close(); navigate({ to: "/checkout" }); }}
             className="btn-neon w-full rounded-full py-3 text-sm disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            Checkout
+            Proceed to Checkout
           </button>
           <Link to="/cart" onClick={close} className="block text-center text-xs text-muted-foreground hover:text-foreground">View full bag</Link>
         </div>

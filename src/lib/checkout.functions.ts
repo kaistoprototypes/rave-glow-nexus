@@ -38,6 +38,7 @@ export const createCheckout = createServerFn({ method: "POST" })
   .inputValidator(z.object({
     email: z.string().email(),
     items: z.array(ItemSchema).min(1).max(50),
+    returnUrl: z.string().url().optional(),
   }))
   .handler(async ({ data }) => {
     const lines = data.items
@@ -55,10 +56,17 @@ export const createCheckout = createServerFn({ method: "POST" })
     if (errs.length > 0) {
       throw new Error(`Shopify: ${errs.map((e: any) => e.message).join(", ")}`);
     }
-    const checkoutUrl = res?.cartCreate?.cart?.checkoutUrl;
+    let checkoutUrl = res?.cartCreate?.cart?.checkoutUrl;
     if (!checkoutUrl) throw new Error("Shopify did not return a checkout URL.");
 
-    return { url: withOnlineStoreChannel(checkoutUrl), orderId: null };
+    checkoutUrl = withOnlineStoreChannel(checkoutUrl);
+    if (data.returnUrl) {
+      const u = new URL(checkoutUrl);
+      u.searchParams.set("return_to", data.returnUrl);
+      checkoutUrl = u.toString();
+    }
+
+    return { url: checkoutUrl, orderId: null };
   });
 
 // Legacy Stripe confirm — kept as no-op so /order/success doesn't crash.
