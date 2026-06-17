@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useCart } from "@/lib/cart-store";
@@ -14,18 +14,30 @@ export const Route = createFileRoute("/checkout")({
 });
 
 function Checkout() {
-  const { items, subtotal, clear } = useCart();
-  const nav = useNavigate();
+  const { items, subtotal } = useCart();
   const checkoutFn = useServerFn(createCheckout);
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => { if (data.user?.email) setEmail(data.user.email); });
   }, []);
 
-  const shipping = subtotal() > 80 ? 0 : 9;
-  const total = subtotal() + shipping;
+  const total = subtotal();
+
+  const redirectToHostedCheckout = (url: string) => {
+    try {
+      if (window.top && window.top !== window) {
+        window.top.location.assign(url);
+        return;
+      }
+    } catch {
+      toast.info("Checkout is ready — use the secure Shopify checkout button below.");
+      return;
+    }
+    window.location.assign(url);
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,8 +54,14 @@ function Checkout() {
           image_palette: i.image_palette,
         })),
       }});
-      if (res.url) { window.open(res.url, "_blank", "noopener,noreferrer"); setLoading(false); }
-      else { toast.error("Could not start checkout"); setLoading(false); }
+      if (res.url) {
+        setCheckoutUrl(res.url);
+        toast.success("Secure Shopify checkout is ready");
+        redirectToHostedCheckout(res.url);
+      } else {
+        toast.error("Could not start checkout");
+      }
+      setLoading(false);
     } catch (err: any) {
       toast.error(err.message ?? "Checkout failed");
       setLoading(false);
@@ -68,12 +86,22 @@ function Checkout() {
             <label className="text-xs uppercase tracking-widest text-muted-foreground">Email</label>
             <input type="email" required value={email} onChange={(e)=>setEmail(e.target.value)} className="mt-1 w-full rounded-md bg-input/60 border border-border px-3 py-2.5 text-sm outline-none focus:border-[color:var(--lime)]" />
           </div>
-          <p className="text-xs text-muted-foreground">Payment, shipping address, and any local taxes are handled securely on the next step via Stripe.</p>
+          <p className="text-xs text-muted-foreground">Payment, shipping address, shipping rates, and taxes are handled securely by Shopify.</p>
           <button type="submit" disabled={loading} className="btn-neon w-full rounded-full py-3.5 text-sm flex items-center justify-center gap-2 disabled:opacity-60">
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
             {loading ? "Preparing checkout…" : `Proceed to Checkout — ${money(total)}`}
           </button>
-          <p className="text-[10px] text-center text-muted-foreground uppercase tracking-widest">Secured by Stripe</p>
+          {checkoutUrl && (
+            <a
+              href={checkoutUrl}
+              target="_top"
+              rel="noopener noreferrer"
+              className="btn-outline-neon block w-full rounded-full py-3 text-center text-xs"
+            >
+              Continue to secure Shopify checkout
+            </a>
+          )}
+          <p className="text-[10px] text-center text-muted-foreground uppercase tracking-widest">Secured by Shopify</p>
         </form>
 
         <aside className="card-glow rounded-2xl p-6 h-fit space-y-3">
@@ -86,7 +114,7 @@ function Checkout() {
           ))}
           <div className="border-t border-border/40 pt-3 space-y-1">
             <div className="flex justify-between text-sm"><span className="text-muted-foreground">Subtotal</span><span>{money(subtotal())}</span></div>
-            <div className="flex justify-between text-sm"><span className="text-muted-foreground">Shipping</span><span>{shipping === 0 ? "Free" : money(shipping)}</span></div>
+            <div className="flex justify-between text-sm"><span className="text-muted-foreground">Shipping & taxes</span><span>Calculated by Shopify</span></div>
             <div className="flex justify-between text-lg font-bold pt-2"><span>Total</span><span className="text-[color:var(--lime)] glow-lime">{money(total)}</span></div>
           </div>
         </aside>
