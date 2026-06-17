@@ -67,7 +67,8 @@ function ProductPage() {
     if (sizes.length && !size) { toast.error("Pick a size"); return; }
     const chosenSize = size ?? sizes[0];
     const variant = (p.variants ?? []).find((v: any) => !chosenSize || v.options?.Size === chosenSize) ?? p.variants?.[0];
-    if (variant && variant.available === false) { toast.error("That option is sold out"); return; }
+    if (!variant?.id) { toast.error("This product has no purchasable variant"); return; }
+    if (variant.available === false) { toast.error("That option is sold out"); return; }
     add({
       productId: p.id,
       variantId: variant?.id,
