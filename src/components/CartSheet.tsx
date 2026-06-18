@@ -1,16 +1,28 @@
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { useCart } from "@/lib/cart-store";
 import { money } from "@/lib/format";
 import { ProductArt } from "./ProductArt";
-import { X, Minus, Plus, Trash2 } from "lucide-react";
+import { X, Minus, Plus, Trash2, Loader2 } from "lucide-react";
+import { createCheckout } from "@/lib/checkout.functions";
+import { startShopifyCheckout } from "@/lib/start-checkout";
+import { supabase } from "@/integrations/supabase/client";
 
 export function CartSheet() {
   const { items, isOpen, close, setQty, remove, subtotal } = useCart();
-  const navigate = useNavigate();
+  const checkoutFn = useServerFn(createCheckout);
   const [mounted, setMounted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => setMounted(true), []);
+
+  const handleCheckout = async () => {
+    setLoading(true);
+    const { data } = await supabase.auth.getUser();
+    const ok = await startShopifyCheckout(checkoutFn as any, items, data.user?.email ?? undefined);
+    if (!ok) setLoading(false);
+  };
 
   const visibleItems = mounted ? items : [];
   const visibleSubtotal = mounted ? subtotal() : 0;
