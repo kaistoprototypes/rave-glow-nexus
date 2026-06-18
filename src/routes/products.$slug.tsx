@@ -203,7 +203,7 @@ function ProductPage() {
         <section className="mt-24">
           <h2 className="font-display text-3xl font-black mb-6">More from this style</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {data.related.map((r: any) => <ProductCard key={r.id} p={r} />)}
+            {data.related.slice(0, limit).map((r: any) => <ProductCard key={r.id} p={r} />)}
           </div>
         </section>
       )}
