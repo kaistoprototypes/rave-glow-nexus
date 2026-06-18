@@ -105,16 +105,24 @@ function Cart() {
               <span>Total</span><span className="text-[color:var(--lime)] glow-lime">{money(total)}</span>
             </div>
             <button
-              onClick={() => {
+              disabled={loading || items.length === 0}
+              onClick={async () => {
                 if (!isAuthed && discount.amount > 0) {
-                  nav({ to: "/login", search: { redirect: "/checkout" } as any });
-                } else {
-                  nav({ to: "/checkout" });
+                  nav({ to: "/login", search: { redirect: "/cart" } as any });
+                  return;
                 }
+                setLoading(true);
+                const ok = await startShopifyCheckout(checkoutFn as any, items, userEmail);
+                if (!ok) setLoading(false);
               }}
-              className="btn-neon w-full rounded-full py-3 text-sm"
+              className="btn-neon w-full rounded-full py-3 text-sm flex items-center justify-center gap-2 disabled:opacity-60"
             >
-              {!isAuthed && discount.amount > 0 ? "Sign in to checkout" : "Proceed to Checkout"}
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              {!isAuthed && discount.amount > 0
+                ? "Sign in to checkout"
+                : loading
+                ? "Redirecting to Shopify…"
+                : "Proceed to Checkout"}
             </button>
           </aside>
         </div>
