@@ -9,6 +9,7 @@ import { money } from "@/lib/format";
 import { Heart, Truck, Shield, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { AdminEditProductButton } from "@/components/AdminEditProductButton";
+import { useProductLimit } from "@/hooks/use-mobile";
 
 export const Route = createFileRoute("/products/$slug")({
   component: ProductPage,
@@ -23,6 +24,7 @@ export const Route = createFileRoute("/products/$slug")({
 type ActiveMedia = { kind: "image"; url: string } | { kind: "video"; url: string } | { kind: "art" };
 
 function ProductPage() {
+  const limit = useProductLimit();
   const { slug } = Route.useParams();
   const add = useCart((s) => s.add);
   const open = useCart((s) => s.open);
@@ -201,7 +203,7 @@ function ProductPage() {
         <section className="mt-24">
           <h2 className="font-display text-3xl font-black mb-6">More from this style</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {data.related.map((r: any) => <ProductCard key={r.id} p={r} />)}
+            {data.related.slice(0, limit).map((r: any) => <ProductCard key={r.id} p={r} />)}
           </div>
         </section>
       )}

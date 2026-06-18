@@ -3,7 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { listShopifyProducts, getShopifyFilterOptions } from "@/lib/shopify-products.functions";
 import { ProductCard } from "@/components/ProductCard";
-import { Search } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { useProductLimit } from "@/hooks/use-mobile";
 
 const search = z.object({
   gender: z.string().optional(),
@@ -14,6 +15,7 @@ const search = z.object({
   sort: z.enum(["newest", "price_asc", "price_desc", "best"]).optional(),
   new_drop: z.string().optional(),
   best_seller: z.string().optional(),
+  page: z.string().optional(),
 });
 
 export const Route = createFileRoute("/shop")({
@@ -30,6 +32,7 @@ export const Route = createFileRoute("/shop")({
 function Shop() {
   const sp = Route.useSearch();
   const nav = useNavigate({ from: "/shop" });
+  const limit = useProductLimit();
 
   const { data: opts } = useQuery({ queryKey: ["shopify-filter-opts"], queryFn: () => getShopifyFilterOptions() });
   const { data, isLoading } = useQuery({
@@ -43,10 +46,20 @@ function Shop() {
       sort: sp.sort,
       new_drop: sp.new_drop === "1",
       best_seller: sp.best_seller === "1",
+      limit: 120,
     } }),
   });
 
-  const update = (patch: Record<string, any>) => nav({ search: (prev: any) => ({ ...prev, ...patch }) as any });
+  const page = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
+  const products = data?.products ?? [];
+  const totalPages = Math.max(1, Math.ceil(products.length / limit));
+  const currentPage = Math.min(page, totalPages);
+  const start = (currentPage - 1) * limit;
+  const paginated = products.slice(start, start + limit);
+
+  const goPage = (p: number) => nav({ search: (prev: any) => ({ ...prev, page: p === 1 ? undefined : String(p) }) as any });
+
+  const update = (patch: Record<string, any>) => nav({ search: (prev: any) => ({ ...prev, page: undefined, ...patch }) as any });
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">
@@ -88,12 +101,24 @@ function Shop() {
         </aside>
 
         <div>
-          {isLoading && <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">{Array.from({length:8}).map((_,i)=>(<div key={i} className="aspect-square rounded-2xl bg-muted/30 animate-pulse" />))}</div>}
-          {!isLoading && (data?.products?.length ?? 0) === 0 && <p className="text-muted-foreground py-20 text-center">No drops match those filters.</p>}
+          {isLoading && <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">{Array.from({length: limit}).map((_,i)=>(<div key={i} className="aspect-square rounded-2xl bg-muted/30 animate-pulse" />))}</div>}
+          {!isLoading && products.length === 0 && <p className="text-muted-foreground py-20 text-center">No drops match those filters.</p>}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {(data?.products ?? []).map((p: any) => <ProductCard key={p.id} p={p} />)}
+            {paginated.map((p: any) => <ProductCard key={p.id} p={p} />)}
           </div>
-          {!isLoading && <p className="mt-8 text-xs text-muted-foreground">{data?.products?.length ?? 0} drops</p>}
+          {!isLoading && products.length > 0 && (
+            <div className="mt-8 flex items-center justify-between">
+              <p className="text-xs text-muted-foreground">{products.length} drops · Page {currentPage} / {totalPages}</p>
+              <div className="flex items-center gap-2">
+                <button disabled={currentPage <= 1} onClick={() => goPage(currentPage - 1)} className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs uppercase tracking-wider hover:border-[color:var(--cyan)] disabled:opacity-30 transition">
+                  <ChevronLeft className="h-3.5 w-3.5" /> Prev
+                </button>
+                <button disabled={currentPage >= totalPages} onClick={() => goPage(currentPage + 1)} className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs uppercase tracking-wider hover:border-[color:var(--cyan)] disabled:opacity-30 transition">
+                  Next <ChevronRight className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

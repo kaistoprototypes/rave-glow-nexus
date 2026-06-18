@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getShopifyHomeData } from "@/lib/shopify-products.functions";
 import { ProductCard } from "@/components/ProductCard";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useProductLimit } from "@/hooks/use-mobile";
 import { PromoBanner } from "@/components/PromoBanner";
 import { Sparkles, Zap, Flame, Music4 } from "lucide-react";
 
@@ -19,6 +19,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
+  const limit = useProductLimit();
   const { data, isLoading } = useQuery({
     queryKey: ["shopify-home"],
     queryFn: () => getShopifyHomeData(),
@@ -52,7 +53,7 @@ function Home() {
 
           <div className="relative h-[520px] hidden md:block animate-fade-up">
             <div className="absolute inset-0 grid grid-cols-2 gap-4">
-              {(data?.featured ?? []).slice(0, 4).map((p: any, i: number) => (
+              {(data?.featured ?? []).slice(0, limit).map((p: any, i: number) => (
                 <Link key={p.id} to="/products/$slug" params={{ slug: p.slug }} className={`card-glow rounded-2xl overflow-hidden group ${i % 2 ? "translate-y-8" : ""}`}>
                   <div className="aspect-square relative">
                     {p.featured_image ? (
@@ -114,8 +115,8 @@ function Home() {
 }
 
 function Section({ title, subtitle, items, loading }: { title: string; subtitle: string; items: any[]; loading: boolean }) {
-  const isMobile = useIsMobile();
-  const maxItems = isMobile ? 4 : 8;
+  const limit = useProductLimit();
+  const maxItems = limit;
   return (
     <section className="px-4 py-14">
       <div className="mx-auto max-w-7xl">
@@ -126,7 +127,7 @@ function Section({ title, subtitle, items, loading }: { title: string; subtitle:
           </div>
           <Link to="/shop" className="text-xs uppercase tracking-widest text-[color:var(--cyan)] hover:text-[color:var(--lime)]">View all →</Link>
         </div>
-        {loading && <div className="grid grid-cols-2 md:grid-cols-4 gap-4">{Array.from({length: isMobile ? 4 : 4}).map((_,i)=>(<div key={i} className="aspect-square rounded-2xl bg-muted/30 animate-pulse" />))}</div>}
+        {loading && <div className="grid grid-cols-2 md:grid-cols-4 gap-4">{Array.from({length: limit}).map((_,i)=>(<div key={i} className="aspect-square rounded-2xl bg-muted/30 animate-pulse" />))}</div>}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {items.slice(0, maxItems).map((p) => (<ProductCard key={p.id} p={p as any} />))}
         </div>

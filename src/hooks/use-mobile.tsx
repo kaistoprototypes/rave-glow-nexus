@@ -17,3 +17,19 @@ export function useIsMobile() {
 
   return !!isMobile;
 }
+
+export function useProductLimit() {
+  const [limit, setLimit] = React.useState(8);
+
+  React.useEffect(() => {
+    const update = () => {
+      const w = window.innerWidth;
+      setLimit(w < 1024 ? 6 : 8);
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  return limit;
+}
