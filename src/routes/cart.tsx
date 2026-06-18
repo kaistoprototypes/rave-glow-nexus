@@ -26,8 +26,14 @@ function Cart() {
   const checkoutFn = useServerFn(createCheckout);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setIsAuthed(!!data.user));
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => setIsAuthed(!!s));
+    supabase.auth.getUser().then(({ data }) => {
+      setIsAuthed(!!data.user);
+      setUserEmail(data.user?.email ?? undefined);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => {
+      setIsAuthed(!!s);
+      setUserEmail(s?.user?.email ?? undefined);
+    });
     return () => subscription.unsubscribe();
   }, []);
 
