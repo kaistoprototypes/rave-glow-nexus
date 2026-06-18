@@ -9,6 +9,7 @@ import { money } from "@/lib/format";
 import { Heart, Truck, Shield, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { AdminEditProductButton } from "@/components/AdminEditProductButton";
+import { useProductLimit } from "@/hooks/use-mobile";
 
 export const Route = createFileRoute("/products/$slug")({
   component: ProductPage,
