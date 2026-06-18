@@ -81,9 +81,9 @@ function Checkout() {
           {checkoutUrl && (
             <a
               href={checkoutUrl}
-              target="_blank"
+              target="_top"
               rel="noopener noreferrer"
-              className="btn-outline-neon block w-full rounded-full py-3 text-center text-xs"
+              className="btn-neon block w-full rounded-full py-3.5 text-center text-sm"
             >
               Continue to secure Shopify checkout
             </a>
