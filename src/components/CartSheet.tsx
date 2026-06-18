@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { useCart } from "@/lib/cart-store";
 import { money } from "@/lib/format";
 import { ProductArt } from "./ProductArt";
@@ -7,6 +8,12 @@ import { X, Minus, Plus, Trash2 } from "lucide-react";
 export function CartSheet() {
   const { items, isOpen, close, setQty, remove, subtotal } = useCart();
   const navigate = useNavigate();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
+  const visibleItems = mounted ? items : [];
+  const visibleSubtotal = mounted ? subtotal() : 0;
 
   return (
     <>
@@ -21,13 +28,13 @@ export function CartSheet() {
           <button onClick={close} className="grid h-8 w-8 place-items-center rounded-full hover:bg-white/10"><X className="h-4 w-4" /></button>
         </div>
         <div className="flex h-[calc(100%-13rem)] flex-col gap-3 overflow-y-auto p-4">
-          {items.length === 0 && (
+          {visibleItems.length === 0 && (
             <div className="text-center py-12 text-muted-foreground">
               <p className="font-display text-xl">Nothing here yet.</p>
               <Link to="/shop" onClick={close} className="btn-neon mt-6 inline-block rounded-full px-6 py-2 text-xs">Browse drops</Link>
             </div>
           )}
-          {items.map((i) => (
+          {visibleItems.map((i) => (
             <div key={`${i.productId}-${i.size}-${i.color}`} className="flex gap-3 rounded-lg border border-border/40 p-2 bg-card/50">
               <div className="h-20 w-20 rounded-md overflow-hidden flex-shrink-0">
                 <ProductArt palette={i.image_palette ?? ["#39FF14", "#00E5FF", "#FF00C8"]} name={i.name} className="h-full w-full" />
@@ -53,10 +60,10 @@ export function CartSheet() {
         <div className="absolute bottom-0 left-0 right-0 border-t border-border/40 p-4 glass space-y-3">
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Subtotal</span>
-            <span className="font-bold text-lg text-[color:var(--lime)] glow-lime">{money(subtotal())}</span>
+            <span className="font-bold text-lg text-[color:var(--lime)] glow-lime">{money(visibleSubtotal)}</span>
           </div>
           <button
-            disabled={items.length === 0}
+            disabled={visibleItems.length === 0}
             onClick={() => { close(); navigate({ to: "/checkout" }); }}
             className="btn-neon w-full rounded-full py-3 text-sm disabled:opacity-40 disabled:cursor-not-allowed"
           >
