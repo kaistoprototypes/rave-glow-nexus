@@ -19,6 +19,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
+  const limit = useProductLimit();
   const { data, isLoading } = useQuery({
     queryKey: ["shopify-home"],
     queryFn: () => getShopifyHomeData(),
