@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getShopifyHomeData } from "@/lib/shopify-products.functions";
 import { ProductCard } from "@/components/ProductCard";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useProductLimit } from "@/hooks/use-mobile";
 import { PromoBanner } from "@/components/PromoBanner";
 import { Sparkles, Zap, Flame, Music4 } from "lucide-react";
 
