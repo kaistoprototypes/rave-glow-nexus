@@ -103,7 +103,7 @@ function Shop() {
         </div>
       </header>
 
-      <div className="mb-6 flex flex-wrap items-center gap-2">
+      <div className="mb-6 flex flex-wrap items-center justify-center gap-2">
         <FilterDropdown
           name="gender"
           label="Gender"
@@ -148,7 +148,7 @@ function Shop() {
         {hasFilters && (
           <button
             onClick={() => { nav({ search: {} }); setOpenKey(null); }}
-            className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs uppercase tracking-wider text-muted-foreground hover:border-[color:var(--magenta)] hover:text-[color:var(--magenta)] transition"
+            className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs uppercase tracking-wider text-foreground/70 hover:bg-white/5 hover:text-[color:var(--magenta)] transition"
           >
             <X className="h-3 w-3" /> Clear
           </button>
@@ -215,7 +215,7 @@ function FilterDropdown({
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpenKey(isOpen ? null : name)}
-        className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs uppercase tracking-wider transition ${active ? "border-[color:var(--cyan)] text-[color:var(--cyan)]" : "border-border text-foreground/80 hover:border-[color:var(--lime)]"}`}
+        className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs uppercase tracking-wider transition ${active ? "border-[color:var(--cyan)] text-[color:var(--cyan)]" : "border-border text-foreground/70 hover:bg-white/5"}`}
       >
         <span>{label}{activeLabel ? `: ${activeLabel}` : ""}</span>
         <ChevronDown className={`h-3.5 w-3.5 transition-transform ${isOpen ? "rotate-180" : ""}`} />
@@ -225,7 +225,7 @@ function FilterDropdown({
           {showAllOption && (
             <button
               onClick={() => onPick(undefined)}
-              className={`w-full text-left text-sm px-3 py-1.5 rounded-lg hover:bg-white/5 ${!current ? "text-[color:var(--cyan)]" : "text-foreground/80"}`}
+              className={`w-full text-left text-sm px-3 py-1.5 rounded-lg hover:bg-white/5 ${!current ? "text-[color:var(--cyan)]" : "text-foreground/70"}`}
             >
               All
             </button>
@@ -234,7 +234,7 @@ function FilterDropdown({
             <button
               key={o.slug}
               onClick={() => onPick(o.slug)}
-              className={`w-full text-left text-sm px-3 py-1.5 rounded-lg hover:bg-white/5 ${current === o.slug ? "text-[color:var(--cyan)] font-semibold" : "text-foreground/80"}`}
+              className={`w-full text-left text-sm px-3 py-1.5 rounded-lg hover:bg-white/5 ${current === o.slug ? "text-[color:var(--cyan)] font-semibold" : "text-foreground/70"}`}
             >
               {o.name}
             </button>
