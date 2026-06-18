@@ -15,6 +15,8 @@ export function CartSheet() {
   const visibleItems = mounted ? items : [];
   const visibleSubtotal = mounted ? subtotal() : 0;
 
+  if (!mounted) return null;
+
   return (
     <>
       {isOpen && <div onClick={close} className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm animate-fade-up" />}
