@@ -215,7 +215,7 @@ function FilterDropdown({
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpenKey(isOpen ? null : name)}
-        className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs uppercase tracking-wider transition ${active ? "border-[color:var(--cyan)] text-[color:var(--cyan)]" : "border-border text-foreground/80 hover:border-[color:var(--lime)]"}`}
+        className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs uppercase tracking-wider transition ${active ? "border-[color:var(--cyan)] text-[color:var(--cyan)]" : "border-border text-foreground/70 hover:bg-white/5"}`}
       >
         <span>{label}{activeLabel ? `: ${activeLabel}` : ""}</span>
         <ChevronDown className={`h-3.5 w-3.5 transition-transform ${isOpen ? "rotate-180" : ""}`} />
