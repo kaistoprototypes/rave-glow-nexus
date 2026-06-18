@@ -5,10 +5,12 @@ import { useServerFn } from "@tanstack/react-start";
 import { useCart } from "@/lib/cart-store";
 import { ProductArt } from "@/components/ProductArt";
 import { money } from "@/lib/format";
-import { Minus, Plus, Trash2, Lock, Sparkles } from "lucide-react";
+import { Minus, Plus, Trash2, Lock, Sparkles, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { listActivePromotions } from "@/lib/promotions.functions";
 import { computeDiscount, findActivePromotion, type Promotion } from "@/lib/promotions";
+import { createCheckout } from "@/lib/checkout.functions";
+import { startShopifyCheckout } from "@/lib/start-checkout";
 
 export const Route = createFileRoute("/cart")({
   head: () => ({ meta: [{ title: "Your bag — Electric Pulse Emporium" }] }),
