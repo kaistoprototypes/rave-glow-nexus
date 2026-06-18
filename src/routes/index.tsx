@@ -53,7 +53,7 @@ function Home() {
 
           <div className="relative h-[520px] hidden md:block animate-fade-up">
             <div className="absolute inset-0 grid grid-cols-2 gap-4">
-              {(data?.featured ?? []).slice(0, 4).map((p: any, i: number) => (
+              {(data?.featured ?? []).slice(0, limit).map((p: any, i: number) => (
                 <Link key={p.id} to="/products/$slug" params={{ slug: p.slug }} className={`card-glow rounded-2xl overflow-hidden group ${i % 2 ? "translate-y-8" : ""}`}>
                   <div className="aspect-square relative">
                     {p.featured_image ? (
