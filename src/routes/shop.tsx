@@ -101,12 +101,24 @@ function Shop() {
         </aside>
 
         <div>
-          {isLoading && <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">{Array.from({length:8}).map((_,i)=>(<div key={i} className="aspect-square rounded-2xl bg-muted/30 animate-pulse" />))}</div>}
-          {!isLoading && (data?.products?.length ?? 0) === 0 && <p className="text-muted-foreground py-20 text-center">No drops match those filters.</p>}
+          {isLoading && <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">{Array.from({length: limit}).map((_,i)=>(<div key={i} className="aspect-square rounded-2xl bg-muted/30 animate-pulse" />))}</div>}
+          {!isLoading && products.length === 0 && <p className="text-muted-foreground py-20 text-center">No drops match those filters.</p>}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {(data?.products ?? []).map((p: any) => <ProductCard key={p.id} p={p} />)}
+            {paginated.map((p: any) => <ProductCard key={p.id} p={p} />)}
           </div>
-          {!isLoading && <p className="mt-8 text-xs text-muted-foreground">{data?.products?.length ?? 0} drops</p>}
+          {!isLoading && products.length > 0 && (
+            <div className="mt-8 flex items-center justify-between">
+              <p className="text-xs text-muted-foreground">{products.length} drops · Page {currentPage} / {totalPages}</p>
+              <div className="flex items-center gap-2">
+                <button disabled={currentPage <= 1} onClick={() => goPage(currentPage - 1)} className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs uppercase tracking-wider hover:border-[color:var(--cyan)] disabled:opacity-30 transition">
+                  <ChevronLeft className="h-3.5 w-3.5" /> Prev
+                </button>
+                <button disabled={currentPage >= totalPages} onClick={() => goPage(currentPage + 1)} className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs uppercase tracking-wider hover:border-[color:var(--cyan)] disabled:opacity-30 transition">
+                  Next <ChevronRight className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
