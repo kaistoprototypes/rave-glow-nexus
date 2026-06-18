@@ -225,7 +225,7 @@ function FilterDropdown({
           {showAllOption && (
             <button
               onClick={() => onPick(undefined)}
-              className={`w-full text-left text-sm px-3 py-1.5 rounded-lg hover:bg-white/5 ${!current ? "text-[color:var(--cyan)]" : "text-foreground/80"}`}
+              className={`w-full text-left text-sm px-3 py-1.5 rounded-lg hover:bg-white/5 ${!current ? "text-[color:var(--cyan)]" : "text-foreground/70"}`}
             >
               All
             </button>
@@ -234,7 +234,7 @@ function FilterDropdown({
             <button
               key={o.slug}
               onClick={() => onPick(o.slug)}
-              className={`w-full text-left text-sm px-3 py-1.5 rounded-lg hover:bg-white/5 ${current === o.slug ? "text-[color:var(--cyan)] font-semibold" : "text-foreground/80"}`}
+              className={`w-full text-left text-sm px-3 py-1.5 rounded-lg hover:bg-white/5 ${current === o.slug ? "text-[color:var(--cyan)] font-semibold" : "text-foreground/70"}`}
             >
               {o.name}
             </button>
