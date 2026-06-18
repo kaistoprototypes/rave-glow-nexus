@@ -24,6 +24,7 @@ export const Route = createFileRoute("/products/$slug")({
 type ActiveMedia = { kind: "image"; url: string } | { kind: "video"; url: string } | { kind: "art" };
 
 function ProductPage() {
+  const limit = useProductLimit();
   const { slug } = Route.useParams();
   const add = useCart((s) => s.add);
   const open = useCart((s) => s.open);
