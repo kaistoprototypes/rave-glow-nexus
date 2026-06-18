@@ -27,9 +27,9 @@ function Checkout() {
   const total = subtotal();
 
   const openCheckoutTab = () => {
-    const tab = window.open("about:blank", "_blank");
+    const tab = window.open("", "_blank");
     if (tab) {
-      tab.document.write("<p style='font-family: system-ui; padding: 24px;'>Preparing secure Shopify checkout…</p>");
+      tab.document.write("<!doctype html><title>Preparing checkout</title><p style='font-family: system-ui; padding: 24px;'>Preparing secure Shopify checkout…</p>");
       tab.document.close();
     }
     return tab;
@@ -37,13 +37,25 @@ function Checkout() {
 
   const redirectToHostedCheckout = (url: string, checkoutTab: Window | null) => {
     if (checkoutTab && !checkoutTab.closed) {
-      checkoutTab.opener = null;
-      checkoutTab.location.assign(url);
+      const encodedUrl = JSON.stringify(url);
+      checkoutTab.document.open();
+      checkoutTab.document.write(`<!doctype html>
+        <title>Opening Shopify checkout</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <body style="font-family: system-ui; padding: 24px;">
+          <p>Opening secure Shopify checkout…</p>
+          <p><a href=${encodedUrl} rel="noopener noreferrer">Continue to secure Shopify checkout</a></p>
+          <script>
+            window.opener = null;
+            window.location.replace(${encodedUrl});
+          </script>
+        </body>`);
+      checkoutTab.document.close();
+      checkoutTab.focus();
       return;
     }
 
     toast.info("Checkout is ready — use the secure Shopify checkout button below.");
-    window.location.assign(url);
   };
 
   const submit = async (e: React.FormEvent) => {
@@ -104,7 +116,7 @@ function Checkout() {
           {checkoutUrl && (
             <a
               href={checkoutUrl}
-              target="_top"
+              target="_blank"
               rel="noopener noreferrer"
               className="btn-outline-neon block w-full rounded-full py-3 text-center text-xs"
             >
