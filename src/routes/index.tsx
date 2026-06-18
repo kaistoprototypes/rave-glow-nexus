@@ -93,18 +93,18 @@ function Home() {
       <Section title="Best sellers" subtitle="What the crew is wearing" items={data?.bestSellers ?? []} loading={isLoading} />
       <Section title="New arrivals" subtitle="Fresh off the press" items={data?.newDrops ?? []} loading={isLoading} />
 
-      <section className="px-4 py-20">
-        <div className="mx-auto max-w-7xl grid gap-6 md:grid-cols-3">
+      <section className="px-4 py-10 md:py-14">
+        <div className="mx-auto max-w-7xl grid gap-4 md:grid-cols-3">
           {[
             { t: "Men", s: "Tees, hoodies, shorts", to: "men" },
             { t: "Women", s: "Crops, tops, bottoms", to: "women" },
             { t: "Accessories", s: "Bags, hats, glasses", to: "accessories" },
           ].map((c) => (
-            <Link key={c.to} to="/shop" search={{ gender: c.to } as any} className="card-glow rounded-2xl p-10 group">
+            <Link key={c.to} to="/shop" search={{ gender: c.to } as any} className="card-glow rounded-2xl p-6 md:p-8 group">
               <p className="text-xs uppercase tracking-widest text-[color:var(--lime)]">Shop</p>
-              <h3 className="mt-2 font-display text-4xl font-black group-hover:text-neon">{c.t}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">{c.s}</p>
-              <span className="mt-6 inline-block text-sm uppercase tracking-widest text-[color:var(--cyan)] group-hover:translate-x-2 transition-transform">Enter →</span>
+              <h3 className="mt-1 font-display text-2xl md:text-3xl font-black group-hover:text-neon">{c.t}</h3>
+              <p className="mt-1 text-sm text-muted-foreground">{c.s}</p>
+              <span className="mt-4 inline-block text-sm uppercase tracking-widest text-[color:var(--cyan)] group-hover:translate-x-2 transition-transform">Enter →</span>
             </Link>
           ))}
         </div>
