@@ -22,10 +22,10 @@ export function Footer() {
         <div>
           <h4 className="mb-3 text-xs font-bold uppercase tracking-widest text-[color:var(--lime)]">Help</h4>
           <ul className="space-y-2 text-sm">
-            <li><Link to="/" className="hover:text-[color:var(--cyan)]">Shipping</Link></li>
-            <li><Link to="/" className="hover:text-[color:var(--cyan)]">Returns</Link></li>
-            <li><Link to="/account" className="hover:text-[color:var(--cyan)]">Account</Link></li>
-            <li><Link to="/" className="hover:text-[color:var(--cyan)]">Contact</Link></li>
+            <li><Link to="/shipping" className="hover:text-[color:var(--cyan)]">Shipping</Link></li>
+            <li><Link to="/returns" className="hover:text-[color:var(--cyan)]">Returns</Link></li>
+            <li><Link to="/faq" className="hover:text-[color:var(--cyan)]">FAQ</Link></li>
+            <li><Link to="/contact" className="hover:text-[color:var(--cyan)]">Contact</Link></li>
           </ul>
         </div>
         <div>
