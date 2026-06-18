@@ -15,6 +15,7 @@ const search = z.object({
   sort: z.enum(["newest", "price_asc", "price_desc", "best"]).optional(),
   new_drop: z.string().optional(),
   best_seller: z.string().optional(),
+  page: z.string().optional(),
 });
 
 export const Route = createFileRoute("/shop")({
