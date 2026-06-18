@@ -103,7 +103,7 @@ function Shop() {
         </div>
       </header>
 
-      <div className="mb-6 flex flex-wrap items-center gap-2">
+      <div className="mb-6 flex flex-wrap items-center justify-center gap-2">
         <FilterDropdown
           name="gender"
           label="Gender"
@@ -148,7 +148,7 @@ function Shop() {
         {hasFilters && (
           <button
             onClick={() => { nav({ search: {} }); setOpenKey(null); }}
-            className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs uppercase tracking-wider text-muted-foreground hover:border-[color:var(--magenta)] hover:text-[color:var(--magenta)] transition"
+            className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs uppercase tracking-wider text-foreground/70 hover:bg-white/5 hover:text-[color:var(--magenta)] transition"
           >
             <X className="h-3 w-3" /> Clear
           </button>
