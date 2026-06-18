@@ -65,20 +65,10 @@ function Checkout() {
             <input type="email" required value={email} onChange={(e)=>setEmail(e.target.value)} className="mt-1 w-full rounded-md bg-input/60 border border-border px-3 py-2.5 text-sm outline-none focus:border-[color:var(--lime)]" />
           </div>
           <p className="text-xs text-muted-foreground">Payment, shipping address, shipping rates, and taxes are handled securely by Shopify.</p>
-          <button type="submit" disabled={loading || !!checkoutUrl} className="btn-neon w-full rounded-full py-3.5 text-sm flex items-center justify-center gap-2 disabled:opacity-60">
+          <button type="submit" disabled={loading} className="btn-neon w-full rounded-full py-3.5 text-sm flex items-center justify-center gap-2 disabled:opacity-60">
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-            {checkoutUrl ? "Checkout ready" : loading ? "Preparing checkout…" : `Proceed to Checkout — ${money(total)}`}
+            {loading ? "Redirecting to Shopify…" : `Proceed to Checkout — ${money(total)}`}
           </button>
-          {checkoutUrl && (
-            <a
-              href={checkoutUrl}
-              target="_top"
-              rel="noopener noreferrer"
-              className="btn-neon block w-full rounded-full py-3.5 text-center text-sm"
-            >
-              Continue to secure Shopify checkout
-            </a>
-          )}
           <p className="text-[10px] text-center text-muted-foreground uppercase tracking-widest">Secured by Shopify</p>
         </form>
 
