@@ -26,43 +26,11 @@ function Checkout() {
 
   const total = subtotal();
 
-  const openCheckoutTab = () => {
-    const tab = window.open("", "_blank");
-    if (tab) {
-      tab.document.write("<!doctype html><title>Preparing checkout</title><p style='font-family: system-ui; padding: 24px;'>Preparing secure Shopify checkout…</p>");
-      tab.document.close();
-    }
-    return tab;
-  };
-
-  const redirectToHostedCheckout = (url: string, checkoutTab: Window | null) => {
-    if (checkoutTab && !checkoutTab.closed) {
-      const encodedUrl = JSON.stringify(url);
-      checkoutTab.document.open();
-      checkoutTab.document.write(`<!doctype html>
-        <title>Opening Shopify checkout</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <body style="font-family: system-ui; padding: 24px;">
-          <p>Opening secure Shopify checkout…</p>
-          <p><a href=${encodedUrl} rel="noopener noreferrer">Continue to secure Shopify checkout</a></p>
-          <script>
-            window.opener = null;
-            window.location.replace(${encodedUrl});
-          </script>
-        </body>`);
-      checkoutTab.document.close();
-      checkoutTab.focus();
-      return;
-    }
-
-    toast.info("Checkout is ready — use the secure Shopify checkout button below.");
-  };
-
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (items.length === 0) { toast.error("Bag is empty"); return; }
     if (!email) { toast.error("Email required"); return; }
-    const checkoutTab = openCheckoutTab();
+    setCheckoutUrl(null);
     setLoading(true);
     try {
       const res = await checkoutFn({ data: {
@@ -76,15 +44,12 @@ function Checkout() {
       }});
       if (res.url) {
         setCheckoutUrl(res.url);
-        toast.success("Secure Shopify checkout is ready");
-        redirectToHostedCheckout(res.url, checkoutTab);
+        toast.success("Checkout is ready — continue with the button below.");
       } else {
-        checkoutTab?.close();
         toast.error("Could not start checkout");
       }
       setLoading(false);
     } catch (err: any) {
-      checkoutTab?.close();
       toast.error(err.message ?? "Checkout failed");
       setLoading(false);
     }
@@ -109,9 +74,9 @@ function Checkout() {
             <input type="email" required value={email} onChange={(e)=>setEmail(e.target.value)} className="mt-1 w-full rounded-md bg-input/60 border border-border px-3 py-2.5 text-sm outline-none focus:border-[color:var(--lime)]" />
           </div>
           <p className="text-xs text-muted-foreground">Payment, shipping address, shipping rates, and taxes are handled securely by Shopify.</p>
-          <button type="submit" disabled={loading} className="btn-neon w-full rounded-full py-3.5 text-sm flex items-center justify-center gap-2 disabled:opacity-60">
+          <button type="submit" disabled={loading || !!checkoutUrl} className="btn-neon w-full rounded-full py-3.5 text-sm flex items-center justify-center gap-2 disabled:opacity-60">
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-            {loading ? "Preparing checkout…" : `Proceed to Checkout — ${money(total)}`}
+            {checkoutUrl ? "Checkout ready" : loading ? "Preparing checkout…" : `Proceed to Checkout — ${money(total)}`}
           </button>
           {checkoutUrl && (
             <a
