@@ -19,16 +19,19 @@ function Checkout() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     supabase.auth.getUser().then(({ data }) => { if (data.user?.email) setEmail(data.user.email); });
   }, []);
 
-  const total = subtotal();
+  const visibleItems = mounted ? items : [];
+  const total = mounted ? subtotal() : 0;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (items.length === 0) { toast.error("Bag is empty"); return; }
+    if (visibleItems.length === 0) { toast.error("Bag is empty"); return; }
     if (!email) { toast.error("Email required"); return; }
     setCheckoutUrl(null);
     setLoading(true);
@@ -36,7 +39,7 @@ function Checkout() {
       const res = await checkoutFn({ data: {
         email,
         returnUrl: window.location.origin + "/order/success",
-        items: items.map((i) => ({
+        items: visibleItems.map((i) => ({
           productId: i.productId, variantId: i.variantId, name: i.name, price: i.price,
           quantity: i.quantity, size: i.size, color: i.color, slug: i.slug,
           image_palette: i.image_palette,
@@ -55,7 +58,16 @@ function Checkout() {
     }
   };
 
-  if (items.length === 0) {
+  if (!mounted) {
+    return (
+      <div className="mx-auto max-w-5xl px-4 py-10">
+        <h1 className="font-display text-4xl md:text-5xl font-black mb-8">Checkout</h1>
+        <div className="card-glow rounded-2xl p-6 text-sm text-muted-foreground">Loading checkout…</div>
+      </div>
+    );
+  }
+
+  if (visibleItems.length === 0) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20 text-center">
         <h1 className="text-4xl font-black">Your bag is empty</h1>
@@ -93,14 +105,14 @@ function Checkout() {
 
         <aside className="card-glow rounded-2xl p-6 h-fit space-y-3">
           <h3 className="font-display text-lg font-bold uppercase tracking-widest mb-2">Order</h3>
-          {items.map((i) => (
+          {visibleItems.map((i) => (
             <div key={`${i.productId}-${i.size}-${i.color}`} className="flex justify-between text-sm">
               <span className="text-foreground/90">{i.name} <span className="text-muted-foreground">× {i.quantity}</span></span>
               <span>{money(i.price * i.quantity)}</span>
             </div>
           ))}
           <div className="border-t border-border/40 pt-3 space-y-1">
-            <div className="flex justify-between text-sm"><span className="text-muted-foreground">Subtotal</span><span>{money(subtotal())}</span></div>
+            <div className="flex justify-between text-sm"><span className="text-muted-foreground">Subtotal</span><span>{money(total)}</span></div>
             <div className="flex justify-between text-sm"><span className="text-muted-foreground">Shipping & taxes</span><span>Calculated by Shopify</span></div>
             <div className="flex justify-between text-lg font-bold pt-2"><span>Total</span><span className="text-[color:var(--lime)] glow-lime">{money(total)}</span></div>
           </div>
