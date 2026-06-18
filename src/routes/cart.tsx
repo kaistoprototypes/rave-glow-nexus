@@ -5,10 +5,12 @@ import { useServerFn } from "@tanstack/react-start";
 import { useCart } from "@/lib/cart-store";
 import { ProductArt } from "@/components/ProductArt";
 import { money } from "@/lib/format";
-import { Minus, Plus, Trash2, Lock, Sparkles } from "lucide-react";
+import { Minus, Plus, Trash2, Lock, Sparkles, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { listActivePromotions } from "@/lib/promotions.functions";
 import { computeDiscount, findActivePromotion, type Promotion } from "@/lib/promotions";
+import { createCheckout } from "@/lib/checkout.functions";
+import { startShopifyCheckout } from "@/lib/start-checkout";
 
 export const Route = createFileRoute("/cart")({
   head: () => ({ meta: [{ title: "Your bag — Electric Pulse Emporium" }] }),
@@ -19,10 +21,19 @@ function Cart() {
   const { items, setQty, remove, subtotal } = useCart();
   const nav = useNavigate();
   const [isAuthed, setIsAuthed] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | undefined>(undefined);
+  const [loading, setLoading] = useState(false);
+  const checkoutFn = useServerFn(createCheckout);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setIsAuthed(!!data.user));
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => setIsAuthed(!!s));
+    supabase.auth.getUser().then(({ data }) => {
+      setIsAuthed(!!data.user);
+      setUserEmail(data.user?.email ?? undefined);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => {
+      setIsAuthed(!!s);
+      setUserEmail(s?.user?.email ?? undefined);
+    });
     return () => subscription.unsubscribe();
   }, []);
 
@@ -94,16 +105,24 @@ function Cart() {
               <span>Total</span><span className="text-[color:var(--lime)] glow-lime">{money(total)}</span>
             </div>
             <button
-              onClick={() => {
+              disabled={loading || items.length === 0}
+              onClick={async () => {
                 if (!isAuthed && discount.amount > 0) {
-                  nav({ to: "/login", search: { redirect: "/checkout" } as any });
-                } else {
-                  nav({ to: "/checkout" });
+                  nav({ to: "/login", search: { redirect: "/cart" } as any });
+                  return;
                 }
+                setLoading(true);
+                const ok = await startShopifyCheckout(checkoutFn as any, items, userEmail);
+                if (!ok) setLoading(false);
               }}
-              className="btn-neon w-full rounded-full py-3 text-sm"
+              className="btn-neon w-full rounded-full py-3 text-sm flex items-center justify-center gap-2 disabled:opacity-60"
             >
-              {!isAuthed && discount.amount > 0 ? "Sign in to checkout" : "Proceed to Checkout"}
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              {!isAuthed && discount.amount > 0
+                ? "Sign in to checkout"
+                : loading
+                ? "Redirecting to Shopify…"
+                : "Proceed to Checkout"}
             </button>
           </aside>
         </div>

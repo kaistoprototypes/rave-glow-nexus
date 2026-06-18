@@ -36,7 +36,7 @@ function withOnlineStoreChannel(url: string): string {
 
 export const createCheckout = createServerFn({ method: "POST" })
   .inputValidator(z.object({
-    email: z.string().email(),
+    email: z.string().email().optional(),
     items: z.array(ItemSchema).min(1).max(50),
     returnUrl: z.string().url().optional(),
   }))
@@ -48,9 +48,9 @@ export const createCheckout = createServerFn({ method: "POST" })
       throw new Error("No items with Shopify variant IDs — cannot create checkout.");
     }
 
-    const res = await shopifyStorefront<any>(CART_CREATE, {
-      input: { lines, buyerIdentity: { email: data.email } },
-    });
+    const input: any = { lines };
+    if (data.email) input.buyerIdentity = { email: data.email };
+    const res = await shopifyStorefront<any>(CART_CREATE, { input });
 
     const errs = res?.cartCreate?.userErrors ?? [];
     if (errs.length > 0) {

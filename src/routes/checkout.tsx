@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useCart } from "@/lib/cart-store";
 import { money } from "@/lib/format";
 import { createCheckout } from "@/lib/checkout.functions";
+import { startShopifyCheckout } from "@/lib/start-checkout";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -18,7 +19,6 @@ function Checkout() {
   const checkoutFn = useServerFn(createCheckout);
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -32,30 +32,9 @@ function Checkout() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (visibleItems.length === 0) { toast.error("Bag is empty"); return; }
-    if (!email) { toast.error("Email required"); return; }
-    setCheckoutUrl(null);
     setLoading(true);
-    try {
-      const res = await checkoutFn({ data: {
-        email,
-        returnUrl: window.location.origin + "/order/success",
-        items: visibleItems.map((i) => ({
-          productId: i.productId, variantId: i.variantId, name: i.name, price: i.price,
-          quantity: i.quantity, size: i.size, color: i.color, slug: i.slug,
-          image_palette: i.image_palette,
-        })),
-      }});
-      if (res.url) {
-        setCheckoutUrl(res.url);
-        toast.success("Checkout is ready — continue with the button below.");
-      } else {
-        toast.error("Could not start checkout");
-      }
-      setLoading(false);
-    } catch (err: any) {
-      toast.error(err.message ?? "Checkout failed");
-      setLoading(false);
-    }
+    const ok = await startShopifyCheckout(checkoutFn as any, visibleItems, email || undefined);
+    if (!ok) setLoading(false);
   };
 
   if (!mounted) {
@@ -86,20 +65,10 @@ function Checkout() {
             <input type="email" required value={email} onChange={(e)=>setEmail(e.target.value)} className="mt-1 w-full rounded-md bg-input/60 border border-border px-3 py-2.5 text-sm outline-none focus:border-[color:var(--lime)]" />
           </div>
           <p className="text-xs text-muted-foreground">Payment, shipping address, shipping rates, and taxes are handled securely by Shopify.</p>
-          <button type="submit" disabled={loading || !!checkoutUrl} className="btn-neon w-full rounded-full py-3.5 text-sm flex items-center justify-center gap-2 disabled:opacity-60">
+          <button type="submit" disabled={loading} className="btn-neon w-full rounded-full py-3.5 text-sm flex items-center justify-center gap-2 disabled:opacity-60">
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-            {checkoutUrl ? "Checkout ready" : loading ? "Preparing checkout…" : `Proceed to Checkout — ${money(total)}`}
+            {loading ? "Redirecting to Shopify…" : `Proceed to Checkout — ${money(total)}`}
           </button>
-          {checkoutUrl && (
-            <a
-              href={checkoutUrl}
-              target="_top"
-              rel="noopener noreferrer"
-              className="btn-neon block w-full rounded-full py-3.5 text-center text-sm"
-            >
-              Continue to secure Shopify checkout
-            </a>
-          )}
           <p className="text-[10px] text-center text-muted-foreground uppercase tracking-widest">Secured by Shopify</p>
         </form>
 
