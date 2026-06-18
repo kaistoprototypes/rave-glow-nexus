@@ -21,6 +21,9 @@ function Cart() {
   const { items, setQty, remove, subtotal } = useCart();
   const nav = useNavigate();
   const [isAuthed, setIsAuthed] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | undefined>(undefined);
+  const [loading, setLoading] = useState(false);
+  const checkoutFn = useServerFn(createCheckout);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setIsAuthed(!!data.user));
