@@ -1,15 +1,20 @@
 import { toast } from "sonner";
 import type { CartItem } from "./cart-store";
-import { createCheckout } from "./checkout.functions";
 
-export async function startShopifyCheckout(items: CartItem[], email?: string) {
+type CheckoutFn = (args: { data: any }) => Promise<{ url: string | null; orderId: string | null }>;
+
+export async function startShopifyCheckout(
+  checkoutFn: CheckoutFn,
+  items: CartItem[],
+  email?: string,
+) {
   const lineItems = items.filter((i) => i.variantId);
   if (lineItems.length === 0) {
     toast.error("Your bag is empty or items can't be purchased.");
-    return;
+    return false;
   }
   try {
-    const res = await createCheckout({
+    const res = await checkoutFn({
       data: {
         email: email || undefined,
         returnUrl: window.location.origin + "/order/success",
@@ -22,10 +27,12 @@ export async function startShopifyCheckout(items: CartItem[], email?: string) {
     });
     if (res.url) {
       window.location.assign(res.url);
-    } else {
-      toast.error("Could not start checkout");
+      return true;
     }
+    toast.error("Could not start checkout");
+    return false;
   } catch (err: any) {
     toast.error(err?.message ?? "Checkout failed");
+    return false;
   }
 }
