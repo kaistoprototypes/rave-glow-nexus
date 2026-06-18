@@ -60,7 +60,7 @@ export function CartSheet() {
         <div className="absolute bottom-0 left-0 right-0 border-t border-border/40 p-4 glass space-y-3">
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Subtotal</span>
-            <span className="font-bold text-lg text-[color:var(--lime)] glow-lime">{money(visibleSubtotal)}</span>
+            <span suppressHydrationWarning className="font-bold text-lg text-[color:var(--lime)] glow-lime">{money(visibleSubtotal)}</span>
           </div>
           <button
             disabled={visibleItems.length === 0}
