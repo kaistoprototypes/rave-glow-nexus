@@ -126,7 +126,7 @@ function Section({ title, subtitle, items, loading }: { title: string; subtitle:
           </div>
           <Link to="/shop" className="text-xs uppercase tracking-widest text-[color:var(--cyan)] hover:text-[color:var(--lime)]">View all →</Link>
         </div>
-        {loading && <div className="grid grid-cols-2 md:grid-cols-4 gap-4">{Array.from({length: isMobile ? 4 : 4}).map((_,i)=>(<div key={i} className="aspect-square rounded-2xl bg-muted/30 animate-pulse" />))}</div>}
+        {loading && <div className="grid grid-cols-2 md:grid-cols-4 gap-4">{Array.from({length: limit}).map((_,i)=>(<div key={i} className="aspect-square rounded-2xl bg-muted/30 animate-pulse" />))}</div>}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {items.slice(0, maxItems).map((p) => (<ProductCard key={p.id} p={p as any} />))}
         </div>
