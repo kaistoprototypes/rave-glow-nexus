@@ -114,8 +114,8 @@ function Home() {
 }
 
 function Section({ title, subtitle, items, loading }: { title: string; subtitle: string; items: any[]; loading: boolean }) {
-  const isMobile = useIsMobile();
-  const maxItems = isMobile ? 4 : 8;
+  const limit = useProductLimit();
+  const maxItems = limit;
   return (
     <section className="px-4 py-14">
       <div className="mx-auto max-w-7xl">
