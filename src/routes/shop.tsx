@@ -1,9 +1,10 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { listShopifyProducts, getShopifyFilterOptions } from "@/lib/shopify-products.functions";
 import { ProductCard } from "@/components/ProductCard";
-import { Search } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { useProductLimit } from "@/hooks/use-mobile";
 
 const search = z.object({
   gender: z.string().optional(),
