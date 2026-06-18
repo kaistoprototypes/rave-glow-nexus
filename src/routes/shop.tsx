@@ -32,6 +32,7 @@ export const Route = createFileRoute("/shop")({
 function Shop() {
   const sp = Route.useSearch();
   const nav = useNavigate({ from: "/shop" });
+  const limit = useProductLimit();
 
   const { data: opts } = useQuery({ queryKey: ["shopify-filter-opts"], queryFn: () => getShopifyFilterOptions() });
   const { data, isLoading } = useQuery({
@@ -45,10 +46,20 @@ function Shop() {
       sort: sp.sort,
       new_drop: sp.new_drop === "1",
       best_seller: sp.best_seller === "1",
+      limit: 120,
     } }),
   });
 
-  const update = (patch: Record<string, any>) => nav({ search: (prev: any) => ({ ...prev, ...patch }) as any });
+  const page = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
+  const products = data?.products ?? [];
+  const totalPages = Math.max(1, Math.ceil(products.length / limit));
+  const currentPage = Math.min(page, totalPages);
+  const start = (currentPage - 1) * limit;
+  const paginated = products.slice(start, start + limit);
+
+  const goPage = (p: number) => nav({ search: (prev: any) => ({ ...prev, page: p === 1 ? undefined : String(p) }) as any });
+
+  const update = (patch: Record<string, any>) => nav({ search: (prev: any) => ({ ...prev, page: undefined, ...patch }) as any });
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">
