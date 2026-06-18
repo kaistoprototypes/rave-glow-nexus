@@ -77,11 +77,12 @@ export function CartSheet() {
             <span suppressHydrationWarning className="font-bold text-lg text-[color:var(--lime)] glow-lime">{money(visibleSubtotal)}</span>
           </div>
           <button
-            disabled={visibleItems.length === 0}
-            onClick={() => { close(); navigate({ to: "/checkout" }); }}
-            className="btn-neon w-full rounded-full py-3 text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+            disabled={visibleItems.length === 0 || loading}
+            onClick={handleCheckout}
+            className="btn-neon w-full rounded-full py-3 text-sm flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            Proceed to Checkout
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+            {loading ? "Redirecting to Shopify…" : "Proceed to Checkout"}
           </button>
           <Link to="/cart" onClick={close} className="block text-center text-xs text-muted-foreground hover:text-foreground">View full bag</Link>
         </div>
