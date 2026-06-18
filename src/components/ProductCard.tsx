@@ -76,7 +76,7 @@ export function ProductCard({ p }: { p: ProductCardData }) {
         <button
           disabled={soldOut}
           onClick={(e) => { e.preventDefault(); handleAdd(); }}
-          className="absolute bottom-2 right-2 inline-flex h-8 items-center gap-1 rounded-full bg-[color:var(--lime)] px-3 text-xs font-bold uppercase text-black ring-glow-lime hover:brightness-110 transition disabled:opacity-40 disabled:cursor-not-allowed opacity-0 group-hover:opacity-100"
+          className="absolute bottom-2 right-2 inline-flex h-8 items-center gap-1 rounded-full bg-[color:var(--lime)] px-3 text-xs font-bold uppercase text-black ring-glow-lime hover:brightness-110 transition disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <Plus className="h-3.5 w-3.5" /> {soldOut ? "Sold out" : "Add"}
         </button>
