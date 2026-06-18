@@ -26,16 +26,23 @@ function Checkout() {
 
   const total = subtotal();
 
-  const redirectToHostedCheckout = (url: string) => {
-    try {
-      if (window.top && window.top !== window) {
-        window.top.location.assign(url);
-        return;
-      }
-    } catch {
-      toast.info("Checkout is ready — use the secure Shopify checkout button below.");
+  const openCheckoutTab = () => {
+    const tab = window.open("about:blank", "_blank");
+    if (tab) {
+      tab.document.write("<p style='font-family: system-ui; padding: 24px;'>Preparing secure Shopify checkout…</p>");
+      tab.document.close();
+    }
+    return tab;
+  };
+
+  const redirectToHostedCheckout = (url: string, checkoutTab: Window | null) => {
+    if (checkoutTab && !checkoutTab.closed) {
+      checkoutTab.opener = null;
+      checkoutTab.location.assign(url);
       return;
     }
+
+    toast.info("Checkout is ready — use the secure Shopify checkout button below.");
     window.location.assign(url);
   };
 
@@ -43,6 +50,7 @@ function Checkout() {
     e.preventDefault();
     if (items.length === 0) { toast.error("Bag is empty"); return; }
     if (!email) { toast.error("Email required"); return; }
+    const checkoutTab = openCheckoutTab();
     setLoading(true);
     try {
       const res = await checkoutFn({ data: {
@@ -57,12 +65,14 @@ function Checkout() {
       if (res.url) {
         setCheckoutUrl(res.url);
         toast.success("Secure Shopify checkout is ready");
-        redirectToHostedCheckout(res.url);
+        redirectToHostedCheckout(res.url, checkoutTab);
       } else {
+        checkoutTab?.close();
         toast.error("Could not start checkout");
       }
       setLoading(false);
     } catch (err: any) {
+      checkoutTab?.close();
       toast.error(err.message ?? "Checkout failed");
       setLoading(false);
     }
