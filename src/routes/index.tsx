@@ -53,9 +53,21 @@ function Home() {
           <div className="relative h-[520px] hidden md:block animate-fade-up">
             <div className="absolute inset-0 grid grid-cols-2 gap-4">
               {(data?.featured ?? []).slice(0, 4).map((p: any, i: number) => (
-                <Link key={p.id} to="/products/$slug" params={{ slug: p.slug }} className={`card-glow rounded-2xl overflow-hidden ${i % 2 ? "translate-y-8" : ""}`}>
-                  <div className="aspect-square">
-                    <ProductArtTiny palette={p.color_palette} name={p.name} />
+                <Link key={p.id} to="/products/$slug" params={{ slug: p.slug }} className={`card-glow rounded-2xl overflow-hidden group ${i % 2 ? "translate-y-8" : ""}`}>
+                  <div className="aspect-square relative">
+                    {p.featured_image ? (
+                      <img
+                        src={p.featured_image}
+                        alt={p.name}
+                        loading="lazy"
+                        className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <ProductArtTiny palette={p.color_palette} name={p.name} />
+                    )}
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent p-3">
+                      <p className="font-display text-sm font-bold text-white line-clamp-2">{p.name}</p>
+                    </div>
                   </div>
                 </Link>
               ))}
